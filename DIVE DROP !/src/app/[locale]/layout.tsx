@@ -28,10 +28,11 @@ export default async function LocaleLayout({
   return (
     <html lang={locale as 'en' | 'he'} dir={isRtl ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <head>
-        <title>DiveDrop</title>
+        <title>DiveDrop - Safe, Responsible, Professional Diving</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content={isRtl ? 'DiveDrop - הדרך החכמה שלך לצלילה בטוחה, אחראית ומקצועית.' : 'DiveDrop - Your smart way to safe, responsible, and professional diving.'} />
       </head>
-      <body>
+      <body className="bg-light-bg dark:bg-dark-bg text-text-primary dark:text-text-light">
         {children}
       </body>
     </html>

@@ -6,209 +6,218 @@
 <title>דוח יולי 2025</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  :root{--bg:#0f172a;--card:#1e293b;--card2:#263548;--accent:#3b82f6;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--text:#e2e8f0;--text2:#94a3b8;--border:#334155;}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);direction:rtl}
-  .header{background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:20px 28px;border-bottom:1px solid var(--border)}
-  .header h1{font-size:24px;font-weight:700}
-  .nav{display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap}
-  .nav-btn{padding:8px 16px;border-radius:8px;background:var(--card2);color:var(--text);text-decoration:none;font-size:13px;border:1px solid var(--border);transition:all 0.2s}
-  .nav-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .nav-btn.disabled{opacity:0.4;cursor:not-allowed}
-  .container{max-width:1200px;margin:0 auto;padding:20px 16px}
-  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
-  .kpi{background:var(--card);border-radius:10px;padding:16px;border:1px solid var(--border)}
-  .kpi .l{color:var(--text2);font-size:11px;text-transform:uppercase}
-  .kpi .v{font-size:20px;font-weight:700;margin-top:4px}
-  .kpi .d{font-size:11px;margin-top:2px}
-  .panel{background:var(--card);border-radius:12px;padding:20px;margin-bottom:20px;border:1px solid var(--border)}
-  .panel h2{font-size:16px;font-weight:600;margin-bottom:14px;color:#fff;border-bottom:1px solid var(--border);padding-bottom:10px}
-  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-  .chart-card{background:var(--card);border-radius:10px;padding:16px;border:1px solid var(--border)}
-  .chart-card h3{font-size:13px;color:var(--text2);margin-bottom:12px}
-  .chart-wrap{position:relative;height:220px}
-  .cat-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-  .cat-btn{padding:7px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--text2);cursor:pointer;font-size:12px;transition:all 0.2s}
-  .cat-btn:hover,.cat-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .table-wrap{overflow-x:auto;max-height:400px}
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th{background:var(--card2);padding:9px 10px;text-align:right;color:var(--text2);font-weight:600;position:sticky;top:0;cursor:pointer;white-space:nowrap}
-  td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:right}
-  tr:hover td{background:rgba(59,130,246,0.05)}
-  .debit{color:var(--red);font-weight:600}
-  .credit{color:var(--green);font-weight:600}
-  .badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
-  .compare-row{display:flex;gap:20px;flex-wrap:wrap}
-  .compare-item{background:var(--card2);border-radius:8px;padding:12px 16px;flex:1;min-width:140px}
-  .compare-item .l{color:var(--text2);font-size:11px}
-  .compare-item .v{font-size:18px;font-weight:700;margin-top:2px}
-  .compare-item .ch{font-size:11px;margin-top:2px}
-  .up{color:var(--green)}.down{color:var(--red)}
-  @media(max-width:600px){.charts-grid{grid-template-columns:1fr}}
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',Arial,sans-serif; background:#0f172a; color:#e2e8f0; direction:rtl; }
+  header { background:linear-gradient(135deg,#1e3a5f,#1e293b); padding:18px 28px; border-bottom:2px solid #2563eb; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  header h1 { font-size:1.4rem; color:#fff; }
+  .nav-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .nav-btn { background:#334155; color:#e2e8f0; padding:7px 16px; border-radius:6px; text-decoration:none; font-size:0.85rem; }
+  .nav-btn:hover { background:#2563eb; }
+  .back-btn { background:#2563eb; color:#fff; padding:7px 16px; border-radius:6px; text-decoration:none; font-size:0.85rem; }
+  .container { max-width:1300px; margin:0 auto; padding:22px; }
+  .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+  .kpi-card { background:#1e293b; border-radius:10px; padding:18px; border:1px solid #334155; }
+  .kpi-card .lbl { font-size:0.78rem; color:#94a3b8; margin-bottom:6px; }
+  .kpi-card .val { font-size:1.5rem; font-weight:700; }
+  .kpi-card.green .val { color:#4ade80; } .kpi-card.red .val { color:#f87171; } .kpi-card.blue .val { color:#60a5fa; } .kpi-card.orange .val { color:#fb923c; }
+  .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
+  @media(max-width:800px) { .charts-grid { grid-template-columns:1fr; } }
+  .chart-card { background:#1e293b; border-radius:10px; padding:18px; border:1px solid #334155; }
+  .chart-card h3 { color:#94a3b8; font-size:0.9rem; margin-bottom:12px; }
+  .chart-wrap { position:relative; height:230px; }
+  .cat-bar { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+  .cat-btn { background:#334155; color:#e2e8f0; border:none; border-radius:20px; padding:5px 13px; cursor:pointer; font-size:0.8rem; }
+  .cat-btn:hover,.cat-btn.active { background:#2563eb; color:#fff; }
+  .panel { background:#263348; border:1px solid #334155; border-radius:10px; padding:18px; margin-bottom:18px; }
+  .panel h3 { color:#60a5fa; margin-bottom:14px; font-size:1rem; }
+  .tbl-wrap { overflow-x:auto; max-height:450px; overflow-y:auto; border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:0.83rem; }
+  thead { position:sticky; top:0; background:#1e3a5f; z-index:5; }
+  th { padding:9px 11px; text-align:right; color:#93c5fd; font-weight:600; border-bottom:2px solid #2563eb; white-space:nowrap; }
+  td { padding:8px 11px; text-align:right; border-bottom:1px solid #334155; }
+  tr:nth-child(even) td { background:rgba(255,255,255,0.02); }
+  tr:hover td { background:rgba(37,99,235,0.08); }
+  .rr { color:#f87171; font-weight:600; } .gg { color:#4ade80; font-weight:600; } .yy { color:#fbbf24; }
+  .tag { padding:2px 7px; border-radius:8px; font-size:0.73rem; background:#334155; }
+  .comp-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .comp-item { background:#1e293b; border-radius:8px; padding:14px; }
+  .comp-lbl { font-size:0.8rem; color:#94a3b8; margin-bottom:6px; }
+  .comp-val { font-size:1.1rem; font-weight:700; }
+  .comp-val.green { color:#4ade80; } .comp-val.red { color:#f87171; }
+  .sep { border:none; border-top:1px solid #334155; margin:22px 0; }
+  .section-title { font-size:1.05rem; font-weight:700; color:#60a5fa; margin-bottom:14px; }
+  .flag-item { background:#1c1010; border:1px solid #991b1b; border-radius:8px; padding:12px 16px; margin-bottom:8px; }
+  .flag-item .ft { color:#f87171; font-weight:700; font-size:0.87rem; } .flag-item .fd { font-size:0.84rem; }
+  footer { text-align:center; padding:20px; color:#64748b; font-size:0.78rem; border-top:1px solid #334155; margin-top:32px; }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>📅 דוח חודש יולי 2025</h1>
-  <div class="nav">
-    <a href="../index.html" class="nav-btn">🏠 חזור לדשבורד</a>
-    <a href="2025-06.html" class="nav-btn">← 2025-06</a>
-    <a href="2025-08.html" class="nav-btn">2025-08 →</a>
+<header>
+  <div>
+    <h1>📅 דוח חודש יולי 2025</h1>
+    <p style="color:#94a3b8;font-size:0.85rem;">חשבון 12-644-317398</p>
   </div>
-</div>
+  <div class="nav-bar">
+    <a class="back-btn" href="../index.html">🏠 דשבורד ראשי</a>
+    <a class="nav-btn" href="2025-06.html">← יוני 2025</a>
+    <a class="nav-btn" href="2025-08.html">אוגוסט 2025 →</a>
+  </div>
+</header>
 <div class="container">
 
+  <!-- KPI -->
   <div class="kpi-grid">
-    <div class="kpi"><div class="l">הכנסות</div><div class="v" style="color:var(--green)">5,206 ₪</div></div>
-    <div class="kpi"><div class="l">הוצאות</div><div class="v" style="color:var(--red)">11,084 ₪</div></div>
-    <div class="kpi"><div class="l">יתרה נטו</div><div class="v" style="color:var(--red)">-5,878 ₪</div></div>
-    <div class="kpi"><div class="l">יתרה בסוף חודש</div><div class="v" style="color:var(--green)">3,889 ₪</div></div>
-    <div class="kpi"><div class="l">עמלות</div><div class="v" style="color:var(--orange)">7,334 ₪</div></div>
-    <div class="kpi"><div class="l">עסקות</div><div class="v">32</div></div>
+    <div class="kpi-card green"><div class="lbl">הכנסות</div><div class="val">₪5,206</div></div>
+    <div class="kpi-card red"><div class="lbl">הוצאות</div><div class="val">₪11,084</div></div>
+    <div class="kpi-card red"><div class="lbl">יתרה נטו</div><div class="val">₪-5,878</div></div>
+    <div class="kpi-card blue"><div class="lbl">יתרה סוף חודש</div><div class="val">₪3,889</div></div>
+    <div class="kpi-card orange"><div class="lbl">עסקות</div><div class="val">32</div></div>
   </div>
 
-  <div class="panel"><h2>📊 השוואה לחודש הקודם</h2><div class="compare-row"><div class="compare-item"><div class="l">הכנסות</div><div class="v" style="color:var(--green)">5,206 ₪</div><div class="ch down">-53.5% מחודש קודם</div></div><div class="compare-item"><div class="l">הוצאות</div><div class="v" style="color:var(--red)">11,084 ₪</div><div class="ch down">+101.6% מחודש קודם</div></div></div></div>
-
+  <!-- Charts -->
   <div class="charts-grid">
-    <div class="chart-card"><h3>📊 הוצאות לפי קטגוריה</h3><div class="chart-wrap"><canvas id="chartCats"></canvas></div></div>
-    <div class="chart-card"><h3>🥧 התפלגות הוצאות</h3><div class="chart-wrap"><canvas id="chartPie"></canvas></div></div>
+    <div class="chart-card"><h3>📊 הוצאות לפי קטגוריה</h3><div class="chart-wrap"><canvas id="chart-cat"></canvas></div></div>
+    <div class="chart-card"><h3>🥧 התפלגות הוצאות</h3><div class="chart-wrap"><canvas id="chart-pie"></canvas></div></div>
   </div>
 
-  <div class="panel">
-    <h2>📂 עסקות לפי קטגוריה</h2>
-    <div class="cat-buttons" id="catButtons"></div>
-    <div id="catPanel"></div>
+  <hr class="sep"><div class="section-title">📊 השוואה לחודש קודם</div>
+        <div class="comp-grid">
+          <div class="comp-item">
+            <div class="comp-lbl">הכנסות (לעומת יוני 2025)</div>
+            <div class="comp-val red">₪-6,000 (-53.5%)</div>
+          </div>
+          <div class="comp-item">
+            <div class="comp-lbl">הוצאות (לעומת יוני 2025)</div>
+            <div class="comp-val red">+₪5,585 (+101.6%)</div>
+          </div>
+        </div>
+
+  <hr class="sep">
+
+  <!-- Category filter -->
+  <div class="section-title">🗂️ עסקות לפי קטגוריה</div>
+  <div class="cat-bar" id="cat-bar"></div>
+  <div class="panel" id="cat-panel">
+    <h3 id="cat-title">כל העסקות</h3>
+    <div class="tbl-wrap"><table id="tbl-main"></table></div>
   </div>
 
-  <div class="panel">
-    <h2>📋 כל עסקות החודש</h2>
-    <div class="table-wrap">
-    <table id="mainTable">
-      <thead><tr>
-        <th onclick="sortT(0)">תאריך</th>
-        <th onclick="sortT(1)">תיאור</th>
-        <th onclick="sortT(2)">פרטים</th>
-        <th onclick="sortT(3)">קטגוריה</th>
-        <th onclick="sortT(4)">חובה ₪</th>
-        <th onclick="sortT(5)">זכות ₪</th>
-        <th onclick="sortT(6)">יתרה ₪</th>
-      </tr></thead>
-      <tbody id="mainTbody"></tbody>
-    </table>
-    </div>
-  </div>
+  <!-- Flags -->
+  <hr class="sep">
+  <div class="section-title">🚨 אזהרות החודש</div>
+  <div id="month-flags"></div>
 
 </div>
+<footer>דוח חודש יולי 2025 | חשבון 12-644-317398</footer>
+
 <script>
-const TXNS = [{"date": "01/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 313.0, "credit": 0.0, "balance": 9453.93, "to_from": "", "purpose": ""}, {"date": "02/07/2025", "desc": "משרד הבינוי וה", "details": "עבור: עופר שחר            מזהה 039076914", "category": "סיוע דיור / מדינה", "debit": 0.0, "credit": 770.0, "balance": 10223.93, "to_from": "", "purpose": ""}, {"date": "02/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 224.93, "credit": 0.0, "balance": 9999.0, "to_from": "", "purpose": ""}, {"date": "03/07/2025", "desc": "ע. מסלול מורחב", "details": "", "category": "עמלות בנק", "debit": 22.0, "credit": 0.0, "balance": 9977.0, "to_from": "", "purpose": ""}, {"date": "03/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 46.0, "credit": 0.0, "balance": 9931.0, "to_from": "", "purpose": ""}, {"date": "03/07/2025", "desc": "שיק", "details": "", "category": "שיק", "debit": 3550.0, "credit": 0.0, "balance": 6381.0, "to_from": "", "purpose": ""}, {"date": "04/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 361.69, "credit": 0.0, "balance": 6019.31, "to_from": "", "purpose": ""}, {"date": "06/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 239.4, "credit": 0.0, "balance": 5779.91, "to_from": "", "purpose": ""}, {"date": "07/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 522.07, "credit": 0.0, "balance": 5257.84, "to_from": "", "purpose": ""}, {"date": "08/07/2025", "desc": "העברה מהבנק", "details": "לטובת: דורי הום בע\"מ עבור: מקדמה לסלון דניאלה סילוני", "category": "העברה יוצאת", "debit": 200.0, "credit": 0.0, "balance": 5057.84, "to_from": "", "purpose": ""}, {"date": "08/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 246.11, "credit": 0.0, "balance": 4811.73, "to_from": "", "purpose": ""}, {"date": "09/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 79.8, "credit": 0.0, "balance": 4731.93, "to_from": "", "purpose": ""}, {"date": "10/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 88.0, "credit": 0.0, "balance": 4643.93, "to_from": "", "purpose": ""}, {"date": "11/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 271.8, "credit": 0.0, "balance": 4372.13, "to_from": "", "purpose": ""}, {"date": "13/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 230.2, "credit": 0.0, "balance": 4141.93, "to_from": "", "purpose": ""}, {"date": "14/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 299.71, "credit": 0.0, "balance": 3842.22, "to_from": "", "purpose": ""}, {"date": "15/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 273.19, "credit": 0.0, "balance": 3569.03, "to_from": "", "purpose": ""}, {"date": "16/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 520.11, "credit": 0.0, "balance": 3048.92, "to_from": "", "purpose": ""}, {"date": "17/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 199.98, "credit": 0.0, "balance": 2848.94, "to_from": "", "purpose": ""}, {"date": "18/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 74.85, "credit": 0.0, "balance": 2774.09, "to_from": "", "purpose": ""}, {"date": "20/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 209.21, "credit": 0.0, "balance": 2564.88, "to_from": "", "purpose": ""}, {"date": "21/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 866.83, "credit": 0.0, "balance": 1698.05, "to_from": "", "purpose": ""}, {"date": "22/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 32.0, "credit": 0.0, "balance": 1666.05, "to_from": "", "purpose": ""}, {"date": "23/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 365.36, "credit": 0.0, "balance": 1300.69, "to_from": "", "purpose": ""}, {"date": "24/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 169.4, "credit": 0.0, "balance": 1131.29, "to_from": "", "purpose": ""}, {"date": "25/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 251.85, "credit": 0.0, "balance": 879.44, "to_from": "", "purpose": ""}, {"date": "27/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 95.1, "credit": 0.0, "balance": 784.34, "to_from": "", "purpose": ""}, {"date": "28/07/2025", "desc": "ביטוח לאומי ג\"", "details": "עבור: שחר עופר            מזהה 039076914", "category": "ביטוח לאומי", "debit": 0.0, "credit": 4436.0, "balance": 5220.34, "to_from": "", "purpose": ""}, {"date": "28/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 296.22, "credit": 0.0, "balance": 4924.12, "to_from": "", "purpose": ""}, {"date": "29/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 67.18, "credit": 0.0, "balance": 4856.94, "to_from": "", "purpose": ""}, {"date": "30/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 164.84, "credit": 0.0, "balance": 4692.1, "to_from": "", "purpose": ""}, {"date": "31/07/2025", "desc": "דירקט- מצטבר", "details": "", "category": "עמלות בנק", "debit": 802.97, "credit": 0.0, "balance": 3889.13, "to_from": "", "purpose": ""}];
-const CAT_DATA = [{"cat": "ביטוח לאומי", "exp": 0.0, "inc": 4436.0, "n": 1}, {"cat": "העברה יוצאת", "exp": 200.0, "inc": 0.0, "n": 1}, {"cat": "סיוע דיור / מדינה", "exp": 0.0, "inc": 770.0, "n": 1}, {"cat": "עמלות בנק", "exp": 7333.8, "inc": 0.0, "n": 28}, {"cat": "שיק", "exp": 3550.0, "inc": 0.0, "n": 1}];
-const CAT_COLORS = {"משכורת": "#4CAF50", "ביטוח לאומי": "#2196F3", "סיוע דיור / מדינה": "#2196F3", "הוראת קבע - בזק": "#FF9800", "הוראת קבע - הוט": "#FF9800", "הוראת קבע - עירייה": "#FF9800", "bit - נכנס": "#00BCD4", "bit - יוצא": "#F44336", "העברה נכנסת": "#00BCD4", "העברה יוצאת": "#F44336", "עמלות בנק": "#9C27B0", "ריבית": "#9C27B0", "עמלת ביטול שיק": "#FF5722", "שיק": "#795548", "החזרת שיק": "#F44336", "משיכת מזומן": "#607D8B", "הפקדת מזומן": "#8BC34A", "עיקול": "#B71C1C", "זיכוי בנקאי": "#009688", "ממונה חדלות פירעון": "#9E9E9E", "אחר": "#757575"};
+const TXNS = [{"d": "2025-07-01", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 313.0, "crd": 0.0, "bal": 9453.93, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-02", "desc": "משרד הבינוי וה", "det": "עבור: עופר שחר            מזהה 039076914", "ref": "83378281", "deb": 0.0, "crd": 770.0, "bal": 10223.93, "cat": "סיוע בשכר דירה"}, {"d": "2025-07-02", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 224.93, "crd": 0.0, "bal": 9999.0, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-03", "desc": "ע. מסלול מורחב", "det": "", "ref": "818", "deb": 22.0, "crd": 0.0, "bal": 9977.0, "cat": "עמלות בנק"}, {"d": "2025-07-03", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 46.0, "crd": 0.0, "bal": 9931.0, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-03", "desc": "שיק", "det": "", "ref": "10002", "deb": 3550.0, "crd": 0.0, "bal": 6381.0, "cat": "צ'קים - יוצא"}, {"d": "2025-07-04", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 361.69, "crd": 0.0, "bal": 6019.31, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-06", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 239.4, "crd": 0.0, "bal": 5779.91, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-07", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 522.07, "crd": 0.0, "bal": 5257.84, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-08", "desc": "העברה מהבנק", "det": "לטובת: דורי הום בע\"מ עבור: מקדמה לסלון דניאלה סילוני", "ref": "404906164", "deb": 200.0, "crd": 0.0, "bal": 5057.84, "cat": "הוצאה אחרת"}, {"d": "2025-07-08", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 246.11, "crd": 0.0, "bal": 4811.73, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-09", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 79.8, "crd": 0.0, "bal": 4731.93, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-10", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 88.0, "crd": 0.0, "bal": 4643.93, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-11", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 271.8, "crd": 0.0, "bal": 4372.13, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-13", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 230.2, "crd": 0.0, "bal": 4141.93, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-14", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 299.71, "crd": 0.0, "bal": 3842.22, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-15", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 273.19, "crd": 0.0, "bal": 3569.03, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-16", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 520.11, "crd": 0.0, "bal": 3048.92, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-17", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 199.98, "crd": 0.0, "bal": 2848.94, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-18", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 74.85, "crd": 0.0, "bal": 2774.09, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-20", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 209.21, "crd": 0.0, "bal": 2564.88, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-21", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 866.83, "crd": 0.0, "bal": 1698.05, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-22", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 32.0, "crd": 0.0, "bal": 1666.05, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-23", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 365.36, "crd": 0.0, "bal": 1300.69, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-24", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 169.4, "crd": 0.0, "bal": 1131.29, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-25", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 251.85, "crd": 0.0, "bal": 879.44, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-27", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 95.1, "crd": 0.0, "bal": 784.34, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-28", "desc": "ביטוח לאומי ג\"", "det": "עבור: שחר עופר            מזהה 039076914", "ref": "60697083", "deb": 0.0, "crd": 4436.0, "bal": 5220.34, "cat": "ביטוח לאומי"}, {"d": "2025-07-28", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 296.22, "crd": 0.0, "bal": 4924.12, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-29", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 67.18, "crd": 0.0, "bal": 4856.94, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-30", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 164.84, "crd": 0.0, "bal": 4692.1, "cat": "דירקט - ויזה (חיוב)"}, {"d": "2025-07-31", "desc": "דירקט- מצטבר", "det": "", "ref": "4935", "deb": 802.97, "crd": 0.0, "bal": 3889.13, "cat": "דירקט - ויזה (חיוב)"}];
+const CATS = [
+  ['all','📋 הכל'],
+  ['דירקט - ויזה (חיוב)','💳 דירקט'],
+  ['משכורת','💰 משכורת'],
+  ['הוראות קבע','🔄 הוראות קבע'],
+  ["צ'קים - יוצא","📝 צ'קים"],
+  ["צ'קים - החזרה","❌ צ'ק חזר"],
+  ['bit נכנס','📲 bit נכנס'],
+  ['העברה נכנסת','⬇️ העברות נכנסות'],
+  ['העברה יוצאת','⬆️ העברות יוצאות'],
+  ['עמלות בנק','🏦 עמלות'],
+  ['ביטוח לאומי','🏛️ ביטוח לאומי'],
+  ['סיוע בשכר דירה','🏠 סיוע שכ"ד'],
+  ['משיכת מזומן - בנקט','💵 מזומן'],
+  ['עיקול/קנסות','⚠️ עיקול'],
+];
 
-function fmt(n) {
-  return new Intl.NumberFormat('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
-}
-function badge(cat) {
-  const c = CAT_COLORS[cat] || '#94a3b8';
-  return `<span class="badge" style="background:${c}22;color:${c}">${cat}</span>`;
-}
+const FMT = n => '₪' + (+n).toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+let charts = {};
 
-// Charts
-const expCats = CAT_DATA.filter(d=>d.exp>0).sort((a,b)=>b.exp-a.exp);
-new Chart(document.getElementById('chartCats'), {
-  type:'bar',
-  data:{
-    labels:expCats.map(d=>d.cat),
-    datasets:[{label:'הוצאות ₪',data:expCats.map(d=>d.exp),
-      backgroundColor:expCats.map(d=>CAT_COLORS[d.cat]||'#94a3b8'),borderRadius:4}]
-  },
-  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
-    plugins:{legend:{display:false}},
-    scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'#334155'}},
-             y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'#334155'}}}
-  }
-});
-new Chart(document.getElementById('chartPie'), {
-  type:'doughnut',
-  data:{
-    labels:expCats.slice(0,8).map(d=>d.cat),
-    datasets:[{data:expCats.slice(0,8).map(d=>d.exp),
-      backgroundColor:expCats.slice(0,8).map(d=>CAT_COLORS[d.cat]||'#94a3b8'),
-      borderWidth:2,borderColor:'#1e293b'}]
-  },
-  options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}}
-  }
-});
-
-// Main table
-function renderTable(txns) {
-  const tb = document.getElementById('mainTbody');
-  tb.innerHTML = txns.map(t=>`<tr>
-    <td>${t.date}</td>
-    <td>${t.desc}</td>
-    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.details}">${t.details}</td>
-    <td>${badge(t.category)}</td>
-    <td class="debit">${t.debit>0?fmt(t.debit)+' ₪':''}</td>
-    <td class="credit">${t.credit>0?fmt(t.credit)+' ₪':''}</td>
-    <td style="color:${t.balance<0?'var(--red)':'var(--text2)'}">${fmt(t.balance)} ₪</td>
-  </tr>`).join('');
-}
-renderTable(TXNS);
-
-// Cat buttons
-const allCats = ['הכל',...new Set(TXNS.map(t=>t.category))];
-const btns = document.getElementById('catButtons');
-allCats.forEach(cat => {
-  const b = document.createElement('button');
-  b.className = 'cat-btn'+(cat==='הכל'?' active':'');
-  b.textContent = cat;
-  b.onclick = ()=>{
-    document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    const filtered = cat==='הכל'?TXNS:TXNS.filter(t=>t.category===cat);
-    renderCatPanel(filtered, cat);
-  };
-  btns.appendChild(b);
-});
-
-function renderCatPanel(txns, cat) {
-  const p = document.getElementById('catPanel');
-  const totD = txns.reduce((s,t)=>s+t.debit,0);
-  const totC = txns.reduce((s,t)=>s+t.credit,0);
-  p.innerHTML = `
-    <div style="font-size:12px;color:var(--text2);margin-bottom:8px">
-      ${txns.length} עסקות | חובה: <span class="debit">${fmt(totD)} ₪</span> | זכות: <span class="credit">${fmt(totC)} ₪</span>
-    </div>
-    <div class="table-wrap"><table><thead><tr>
-      <th>תאריך</th><th>תיאור</th><th>פרטים</th><th>ממי/למי</th><th>עבור מה</th><th>חובה ₪</th><th>זכות ₪</th><th>יתרה ₪</th>
-    </tr></thead><tbody>
-    ${txns.map(t=>`<tr>
-      <td>${t.date}</td><td>${t.desc}</td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis" title="${t.details}">${t.details}</td>
-      <td>${t.to_from||''}</td><td>${t.purpose||''}</td>
-      <td class="debit">${t.debit>0?fmt(t.debit)+' ₪':''}</td>
-      <td class="credit">${t.credit>0?fmt(t.credit)+' ₪':''}</td>
-      <td style="color:${t.balance<0?'var(--red)':'var(--text2)'}">${fmt(t.balance)} ₪</td>
-    </tr>`).join('')}
-    </tbody></table></div>`;
-}
-renderCatPanel(TXNS, 'הכל');
-
-function sortT(col) {
-  const tb = document.getElementById('mainTable');
-  const rows = Array.from(tb.querySelectorAll('tbody tr'));
-  const asc = tb.dataset.dir !== 'asc';
-  tb.dataset.dir = asc?'asc':'desc';
-  rows.sort((a,b)=>{
-    const av=a.cells[col]?.textContent.replace(/[,₪\s]/g,'')||'';
-    const bv=b.cells[col]?.textContent.replace(/[,₪\s]/g,'')||'';
-    const an=parseFloat(av),bn=parseFloat(bv);
-    if(!isNaN(an)&&!isNaN(bn)) return asc?an-bn:bn-an;
-    return asc?av.localeCompare(bv,'he'):bv.localeCompare(av,'he');
+function makeTbl(id, headers, rows) {
+  const tbl = document.getElementById(id);
+  if (!tbl) return;
+  tbl.innerHTML = '';
+  const thead = tbl.createTHead();
+  const hr = thead.insertRow();
+  headers.forEach(h => { const th=document.createElement('th'); th.textContent=h; hr.appendChild(th); });
+  const tbody = tbl.createTBody();
+  rows.forEach(row => {
+    const tr = tbody.insertRow();
+    row.forEach(cell => {
+      const td = tr.insertCell();
+      if (cell && typeof cell==='object' && cell.html) td.innerHTML=cell.html;
+      else td.textContent = cell??'';
+    });
   });
-  const tbody=tb.querySelector('tbody');
-  rows.forEach(r=>tbody.appendChild(r));
 }
+
+function buildCharts() {
+  const cats={};
+  TXNS.filter(t=>t.deb>0).forEach(t => cats[t.cat]=(cats[t.cat]||0)+t.deb);
+  const labels=Object.keys(cats), data=Object.values(cats);
+  const colors=['#2563eb','#dc2626','#16a34a','#ea580c','#7c3aed','#0891b2','#be185d','#92400e','#065f46','#1e40af'];
+  
+  if(charts.cat) charts.cat.destroy();
+  charts.cat = new Chart(document.getElementById('chart-cat'), {
+    type:'bar',
+    data:{labels, datasets:[{label:'הוצאות',data,backgroundColor:colors,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#64748b',maxRotation:45},grid:{color:'#1e293b'}},
+              y:{ticks:{color:'#64748b',callback:v=>'₪'+v.toLocaleString()},grid:{color:'#334155'}}}}
+  });
+
+  if(charts.pie) charts.pie.destroy();
+  charts.pie = new Chart(document.getElementById('chart-pie'), {
+    type:'doughnut',
+    data:{labels, datasets:[{data, backgroundColor:colors, borderWidth:2, borderColor:'#0f172a'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'left',labels:{color:'#94a3b8',font:{size:10},boxWidth:12}}}}
+  });
+}
+
+function buildCatButtons() {
+  const bar = document.getElementById('cat-bar');
+  CATS.forEach(([cat, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (cat==='all'?' active':'');
+    btn.textContent = label;
+    btn.onclick = () => {
+      document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      buildTable(cat);
+      document.getElementById('cat-title').textContent = CATS.find(c=>c[0]===cat)?.[1]||'הכל';
+    };
+    bar.appendChild(btn);
+  });
+}
+
+function buildTable(cat) {
+  const rows = TXNS.filter(t => cat==='all' || t.cat===cat).map(t => [
+    t.d, t.desc, t.det.substring(0,60),
+    t.deb ? {html:`<span class="rr">${FMT(t.deb)}</span>`} : '',
+    t.crd ? {html:`<span class="gg">${FMT(t.crd)}</span>`} : '',
+    {html:`<span class="${t.bal<0?'rr':'yy'}">${FMT(t.bal)}</span>`},
+    {html:`<span class="tag">${t.cat}</span>`},
+  ]);
+  makeTbl('tbl-main',['תאריך','תיאור','פרטים','חובה','זכות','יתרה','קטגוריה'],rows);
+}
+
+function buildFlags() {
+  const flags = TXNS.filter(t => t.cat.includes('החזרה') || t.cat==='עיקול/קנסות' || t.bal<0);
+  const div = document.getElementById('month-flags');
+  if (flags.length===0) { div.innerHTML='<p style="color:#94a3b8;">אין אזהרות לחודש זה ✅</p>'; return; }
+  div.innerHTML = flags.map(t => `
+    <div class="flag-item">
+      <div class="ft">${t.cat.includes('החזרה') ? "❌ צ'ק חזר" : t.cat==='עיקול/קנסות' ? '⚠️ עיקול' : '📉 יתרה שלילית'}</div>
+      <div class="fd" style="color:#94a3b8;">${t.d} | ${t.desc} | ${FMT(t.deb||t.crd)}</div>
+      ${t.det ? `<div class="fd" style="color:#64748b;margin-top:3px;">${t.det.substring(0,80)}</div>` : ''}
+    </div>`).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildCharts();
+  buildCatButtons();
+  buildTable('all');
+  buildFlags();
+});
 </script>
 </body>
 </html>

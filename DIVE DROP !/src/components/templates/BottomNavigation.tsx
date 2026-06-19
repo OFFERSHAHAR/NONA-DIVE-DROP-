@@ -218,82 +218,65 @@ BottomNavigation.displayName = 'BottomNavigation';
  * Preset navigation configurations
  */
 export const BottomNavigationPresets = {
-  diveDropMain: (activeId?: string): NavItem[] => [
-    {
-      id: 'home',
-      label: 'Home',
-      href: '/',
-      ariaLabel: 'Navigate to home',
-      icon: (
-        <svg
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'explore',
-      label: 'Explore',
-      href: '/explore',
-      ariaLabel: 'Explore dive sites',
-      icon: (
-        <svg
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'bookings',
-      label: 'Bookings',
-      href: '/bookings',
-      ariaLabel: 'View your bookings',
-      icon: (
-        <svg
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.08-2.51c-.29-.35-.77-.35-1.06 0-.29.35-.29.93 0 1.28l2.61 3.13c.29.35.77.35 1.06 0l3.28-4.21c.29-.35.29-.93 0-1.28-.29-.36-.77-.36-1.06-.01z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'messages',
-      label: 'Messages',
-      href: '/messages',
-      ariaLabel: 'View messages',
-      badge: 2,
-      icon: (
-        <svg
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      href: '/profile',
-      ariaLabel: 'View your profile',
-      icon: (
-        <svg
-          className="h-6 w-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-        </svg>
-      ),
-    },
-  ],
+  diveDropMain: (activeId?: string, locale: string = 'en'): NavItem[] => {
+    const isRTL = locale === 'he';
+    return [
+      {
+        id: 'explore',
+        label: isRTL ? '🔍 גילוי' : '🔍 Explore',
+        href: `/${locale}/explore`,
+        ariaLabel: isRTL ? 'גלה אתרי צלילה' : 'Explore dive sites',
+        icon: (
+          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth={2} stroke="currentColor" fill="none" />
+          </svg>
+        ),
+      },
+      {
+        id: 'messages',
+        label: isRTL ? '💬 הודעות' : '💬 Messages',
+        href: `/${locale}/messages`,
+        ariaLabel: isRTL ? 'הודעות' : 'Messages',
+        badge: 0,
+        icon: (
+          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+          </svg>
+        ),
+      },
+      {
+        id: 'home',
+        label: isRTL ? '🏠 בית' : '🏠 Home',
+        href: `/${locale}`,
+        ariaLabel: isRTL ? 'דף הבית' : 'Home',
+        icon: (
+          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
+        ),
+      },
+      {
+        id: 'bookings',
+        label: isRTL ? '📅 הזמנות' : '📅 Bookings',
+        href: `/${locale}/bookings`,
+        ariaLabel: isRTL ? 'ההזמנות שלי' : 'My bookings',
+        icon: (
+          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.08-2.51c-.29-.35-.77-.35-1.06 0-.29.35-.29.93 0 1.28l2.61 3.13c.29.35.77.35 1.06 0l3.28-4.21c.29-.35.29-.93 0-1.28-.29-.36-.77-.36-1.06-.01z" />
+          </svg>
+        ),
+      },
+      {
+        id: 'profile',
+        label: isRTL ? '👤 פרופיל' : '👤 Profile',
+        href: `/${locale}/profile`,
+        ariaLabel: isRTL ? 'הפרופיל שלי' : 'My profile',
+        icon: (
+          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+          </svg>
+        ),
+      },
+    ];
+  },
 };
