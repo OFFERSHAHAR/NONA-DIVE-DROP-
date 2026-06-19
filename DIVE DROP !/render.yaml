@@ -9,14 +9,8 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_SUPABASE_URL
-        fromDatabase:
-          name: dive-drop-db
-          property: supabase_url
+        sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
-        fromDatabase:
-          name: dive-drop-db
-          property: supabase_anon_key
+        sync: false
       - key: ANTHROPIC_API_KEY
-        fromDatabase:
-          name: dive-drop-db
-          property: anthropic_api_key
+        sync: false
