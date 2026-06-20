@@ -1,6 +1,6 @@
 /**
  * Image Upload Utility for Dive Site Feedback System
- * Handles client-side image validation, compression, and upload to Supabase Storage
+ * Handles client-side image validation, compression, watermarking, and upload to Supabase Storage
  *
  * Constraints:
  * - Max file size: 2MB (per Global Constraints)
@@ -10,9 +10,11 @@
  * - Min dimensions: 100x100px
  * - Storage path: {diverId}/{timestamp}_{sanitizedFilename}
  * - Bucket: feedback_images (private, requires signed URLs)
+ * - Watermark: Applied before upload (logo style, bottom-right, 70% opacity)
  */
 
 import { createClient } from '@/lib/supabase/client';
+import { applyWatermark, WatermarkError, type WatermarkStyle } from './watermarkGenerator';
 
 // ============================================================================
 // CONSTANTS
@@ -58,6 +60,9 @@ export class ImageUploadError extends Error {
     this.name = 'ImageUploadError';
   }
 }
+
+// Re-export WatermarkError for convenience
+export { WatermarkError } from './watermarkGenerator';
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -255,20 +260,23 @@ export async function compressImage(file: File): Promise<Blob> {
 }
 
 /**
- * uploadFeedbackImage uploads a compressed image to Supabase Storage.
+ * uploadFeedbackImage uploads a compressed and watermarked image to Supabase Storage.
  *
  * Process:
  * 1. Validates the image
  * 2. Compresses the image
- * 3. Uploads to Supabase Storage bucket `feedback_images`
- * 4. Generates and returns a signed URL (valid for 1 hour, bucket is private)
+ * 3. Applies watermark to the image (default: logo style)
+ * 4. Uploads to Supabase Storage bucket `feedback_images`
+ * 5. Generates and returns a signed URL (valid for 1 hour, bucket is private)
  *
  * Storage path format: {diverId}/{timestamp}_{sanitizedFilename}
  *
  * @param file - The image File object to upload
  * @param diverId - UUID of the diver uploading the image
+ * @param watermarkStyle - Style of watermark to apply (default: 'logo')
  * @throws ImageValidationError if validation fails
  * @throws ImageCompressionError if compression fails
+ * @throws WatermarkError if watermarking fails
  * @throws ImageUploadError if upload or signing fails
  * @returns Promise<string> - Public signed URL for the uploaded image
  *
@@ -276,17 +284,33 @@ export async function compressImage(file: File): Promise<Blob> {
  * const diverId = 'diver-uuid-123';
  * const file = fileInput.files[0];
  * try {
- *   const signedUrl = await uploadFeedbackImage(file, diverId);
+ *   const signedUrl = await uploadFeedbackImage(file, diverId, 'logo');
  *   console.log('Image uploaded:', signedUrl);
  *   // Store signedUrl in feedback data
  * } catch (error) {
  *   console.error('Upload failed:', error.message);
  * }
  */
-export async function uploadFeedbackImage(file: File, diverId: string): Promise<string> {
+export async function uploadFeedbackImage(
+  file: File,
+  diverId: string,
+  watermarkStyle: WatermarkStyle = 'logo'
+): Promise<string> {
   try {
     // Compress image
     const compressedBlob = await compressImage(file);
+
+    // Apply watermark
+    let finalBlob: Blob = compressedBlob;
+    try {
+      finalBlob = await applyWatermark(compressedBlob, watermarkStyle);
+    } catch (error) {
+      // Log watermark error but continue with non-watermarked image
+      console.warn(
+        'Watermark application failed, uploading without watermark:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
+    }
 
     // Create storage path
     const timestamp = Date.now();
@@ -299,7 +323,7 @@ export async function uploadFeedbackImage(file: File, diverId: string): Promise<
     // Upload to storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(storagePath, compressedBlob, {
+      .upload(storagePath, finalBlob, {
         contentType: file.type === 'image/png' ? 'image/png' : 'image/jpeg',
         upsert: false,
       });
@@ -326,6 +350,7 @@ export async function uploadFeedbackImage(file: File, diverId: string): Promise<
     if (
       error instanceof ImageValidationError ||
       error instanceof ImageCompressionError ||
+      error instanceof WatermarkError ||
       error instanceof ImageUploadError
     ) {
       throw error;
