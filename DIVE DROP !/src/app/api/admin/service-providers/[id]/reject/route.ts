@@ -3,10 +3,11 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
+    const { id } = await params;
     const { reason } = await request.json();
 
     // Verify admin
@@ -25,7 +26,7 @@ export async function POST(
         status: 'archived',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -33,7 +34,7 @@ export async function POST(
 
     // Log action
     await supabase.from('provider_moderation_log').insert({
-      provider_id: params.id,
+      provider_id: id,
       action: 'Provider rejected',
       reason: reason || 'No reason provided',
       admin_user_id: user.id,
