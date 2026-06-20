@@ -128,6 +128,35 @@
     "sort_by": "מיין לפי",
     "filter_by_month": "סנן לפי חודש"
   },
+  "tracking": {
+    "live": "🟢 חי",
+    "loading_location": "טוען מיקום...",
+    "error_loading": "שגיאה בטעינת נתוני המעקב",
+    "retry": "נסה שוב",
+    "center_map": "מרכז את המפה על המיקום שלי",
+    "zoom_in": "הגדל",
+    "zoom_out": "הקטן",
+    "vehicle": "רכב",
+    "capacity": "קיבולת",
+    "distance": "מרחק",
+    "eta": "ETA",
+    "arriving_now": "מגיע עכשיו!",
+    "call_driver": "התקשר לנהג",
+    "message": "הודעה",
+    "driver_arrived_msg": "הנהג הגיע למיקומך!",
+    "no_shuttle_assigned": "עדיין לא הוקצה רכבת",
+    "status": {
+      "pending": "בהמתנה",
+      "assigned": "נהג הוקצה",
+      "en_route": "הרכב בדרך",
+      "arrived": "הנהג הגיע",
+      "to_site": "בדרך לאתר",
+      "completed": "הושלם"
+    },
+    "reviews": "ביקורות",
+    "tracking_active": "📍 מעקב פעיל",
+    "tracking_inactive": "⚪ לא פעיל"
+  },
   "settings": {
     "title": "הגדרות",
     "subtitle": "נהל את ההעדפות והחשבון שלך",

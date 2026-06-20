@@ -17,7 +17,6 @@ export function AppNavigation() {
     <BottomNavigation
       items={BottomNavigationPresets.diveDropMain(activeId, locale)}
       activeId={activeId}
-      showLabels={false}
     />
   );
 }

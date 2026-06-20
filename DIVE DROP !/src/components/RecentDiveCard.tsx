@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { Button } from './Button';
+import { AppIcon } from './AppIcon';
 
 export interface RecentDiveCardProps {
   name: string;
@@ -82,11 +83,11 @@ export const RecentDiveCard = React.forwardRef<HTMLDivElement, RecentDiveCardPro
               )}
             >
               <span className="flex items-center gap-1">
-                <span>🗓️</span>
+                <AppIcon name="calendar" className="h-4 w-4" />
                 <span>{date}</span>
               </span>
               <span className="flex items-center gap-1">
-                <span>⏰</span>
+                <AppIcon name="clock" className="h-4 w-4" />
                 <span>{time}</span>
               </span>
             </div>
@@ -104,14 +105,14 @@ export const RecentDiveCard = React.forwardRef<HTMLDivElement, RecentDiveCardPro
         >
           {/* Organized Status */}
           <span className={clsx('flex items-center gap-1', isRTL ? 'flex-row-reverse' : '')}>
-            <span>👥</span>
+            <AppIcon name="users" className="h-4 w-4" />
             <span>{organized ? 'מאורגנת' : 'פרטית'}</span>
           </span>
 
           {/* Instructor */}
           {instructor && (
             <span className={clsx('flex items-center gap-1', isRTL ? 'flex-row-reverse' : '')}>
-              <span>👤</span>
+              <AppIcon name="user" className="h-4 w-4" />
               <span>מדריך: {instructor}</span>
             </span>
           )}
@@ -119,7 +120,7 @@ export const RecentDiveCard = React.forwardRef<HTMLDivElement, RecentDiveCardPro
           {/* Participants Count */}
           {participants !== undefined && (
             <span className={clsx('flex items-center gap-1', isRTL ? 'flex-row-reverse' : '')}>
-              <span>👨‍👩‍👧‍👦</span>
+              <AppIcon name="users" className="h-4 w-4" />
               <span>{participants} משתתפים</span>
             </span>
           )}

@@ -128,6 +128,35 @@
     "sort_by": "Sort by",
     "filter_by_month": "Filter by Month"
   },
+  "tracking": {
+    "live": "🟢 Live",
+    "loading_location": "Loading location...",
+    "error_loading": "Error loading tracking data",
+    "retry": "Try Again",
+    "center_map": "Center map on my location",
+    "zoom_in": "Zoom In",
+    "zoom_out": "Zoom Out",
+    "vehicle": "Vehicle",
+    "capacity": "Capacity",
+    "distance": "Distance",
+    "eta": "ETA",
+    "arriving_now": "Arriving now!",
+    "call_driver": "Call Driver",
+    "message": "Message",
+    "driver_arrived_msg": "Your driver has arrived at your location!",
+    "no_shuttle_assigned": "No shuttle assigned yet",
+    "status": {
+      "pending": "Pending",
+      "assigned": "Driver Assigned",
+      "en_route": "On the way",
+      "arrived": "Driver Arrived",
+      "to_site": "En route to site",
+      "completed": "Completed"
+    },
+    "reviews": "reviews",
+    "tracking_active": "📍 Tracking Active",
+    "tracking_inactive": "⚪ Inactive"
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your preferences and account",

@@ -1,0 +1,163 @@
+{
+  "dashboard": {
+    "title": "לוח בקרה",
+    "subtitle": "ברוכים הבאים לתא הבקרה שלך",
+    "stats": {
+      "users": "סה\"כ משתמשים",
+      "dive_sites": "אתרי צלילה",
+      "shuttles": "וניטות",
+      "active_shuttles": "וניטות פעילות"
+    },
+    "actions": {
+      "manage": "ניהול"
+    },
+    "users": {
+      "title": "ניהול משתמשים",
+      "description": "צור וניהל חשבונות משתמשים"
+    },
+    "dive_sites": {
+      "title": "ניהול אתרי צלילה",
+      "description": "נהל את מסד נתוני אתרי הצלילה שלך"
+    },
+    "shuttles": {
+      "title": "ניהול וניטות",
+      "description": "נהל את שיירת הוניטות והנהגים"
+    },
+    "recent_activity": "פעילות אחרונה"
+  },
+  "nav": {
+    "dashboard": "לוח בקרה",
+    "users": "משתמשים",
+    "dive_sites": "אתרי צלילה",
+    "shuttles": "וניטות",
+    "settings": "הגדרות",
+    "logout": "התנתקות"
+  },
+  "login": {
+    "title": "כניסה למנהל",
+    "subtitle": "התחברו לחשבון הניהול שלכם",
+    "email": "כתובת דוא\"ל",
+    "email_placeholder": "admin@example.com",
+    "password": "סיסמא",
+    "password_placeholder": "הזן את הסיסמה שלך",
+    "sign_in": "התחבר",
+    "signing_in": "מתחבר...",
+    "demo_title": "אישורי ניסיון",
+    "footer": "© 2024 DIVE DROP ניהול. כל הזכויות שמורות.",
+    "error": {
+      "invalid_credentials": "דוא\"ל או סיסמה שגויים",
+      "unknown": "שגיאה במהלך ההתחברות"
+    }
+  },
+  "users": {
+    "title": "משתמשים",
+    "subtitle": "ניהול חשבונות משתמשים",
+    "no_users": "לא נמצאו משתמשים",
+    "add_user": "הוסף משתמש",
+    "edit_user": "ערוך משתמש",
+    "search_placeholder": "חפש משתמשים לפי שם או דוא\"ל...",
+    "table": {
+      "name": "שם",
+      "email": "דוא\"ל",
+      "role": "תפקיד",
+      "status": "סטטוס",
+      "actions": "פעולות",
+      "active": "פעיל",
+      "inactive": "לא פעיל"
+    },
+    "form": {
+      "name": "שם מלא",
+      "email": "כתובת דוא\"ל",
+      "role": "תפקיד",
+      "password": "סיסמא",
+      "leave_blank": "השאר ריק כדי לשמור על הסיסמה הנוכחית"
+    }
+  },
+  "dive_sites": {
+    "title": "אתרי צלילה",
+    "subtitle": "ניהול אתרי הצלילה שלך",
+    "no_sites": "לא נמצאו אתרי צלילה",
+    "add_site": "הוסף אתר צלילה",
+    "edit_site": "ערוך אתר צלילה",
+    "search_placeholder": "חפש אתרי צלילה...",
+    "table": {
+      "name": "שם האתר",
+      "location": "מיקום",
+      "difficulty": "רמת קושי",
+      "max_depth": "עומק מרבי",
+      "actions": "פעולות"
+    },
+    "form": {
+      "name": "שם האתר",
+      "description": "תיאור",
+      "latitude": "קו רוחב",
+      "longitude": "קו אורך",
+      "address": "כתובת",
+      "difficulty": "רמת קושי",
+      "max_depth": "עומק מרבי",
+      "tags": "תגיות"
+    }
+  },
+  "shuttles": {
+    "title": "וניטות",
+    "subtitle": "ניהול שיירת הוניטות שלך",
+    "no_shuttles": "לא נמצאו וניטות",
+    "add_shuttle": "הוסף וניטה",
+    "edit_shuttle": "ערוך וניטה",
+    "search_placeholder": "חפש וניטות...",
+    "table": {
+      "name": "שם הוניטה",
+      "driver": "נהג",
+      "registration": "רישום",
+      "capacity": "קיבולת",
+      "status": "סטטוס",
+      "actions": "פעולות"
+    },
+    "form": {
+      "name": "שם הוניטה",
+      "driver": "נהג",
+      "registration": "מספר רישום",
+      "capacity": "קיבולת נוסעים",
+      "availability": "לוח זמנים של זמינות שבועי"
+    }
+  },
+  "settings": {
+    "title": "הגדרות",
+    "subtitle": "ניהול הגדרות ותצורה של המנהל",
+    "profile": {
+      "title": "מידע פרופיל",
+      "name": "שם מלא",
+      "email": "כתובת דוא\"ל",
+      "role": "תפקיד",
+      "status": "סטטוס חשבון",
+      "active": "פעיל",
+      "inactive": "לא פעיל"
+    },
+    "api": {
+      "title": "מפתחות API",
+      "description": "השתמש במפתחות אלה להנפקת בקשות API",
+      "copy": "העתק",
+      "copied": "הועתק!"
+    },
+    "system": {
+      "title": "מידע המערכת",
+      "version": "גרסה",
+      "database": "מסד נתונים",
+      "environment": "סביבה",
+      "status": "סטטוס המערכת"
+    },
+    "docs": {
+      "title": "תיעוד",
+      "description": "גישה למשאבים ולקצרים שימושיים"
+    }
+  },
+  "common": {
+    "search": "חיפוש...",
+    "edit": "ערוך",
+    "delete": "מחק",
+    "create": "צור",
+    "update": "עדכן",
+    "cancel": "בטל",
+    "confirm_delete": "האם אתה בטוח שברצונך למחוק פריט זה? לא ניתן לבטל פעולה זו."
+  }
+}

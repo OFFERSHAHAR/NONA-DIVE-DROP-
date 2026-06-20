@@ -1,0 +1,28 @@
+{
+  "tracking": {
+    "live": "Live",
+    "no_shuttle_assigned": "No shuttle assigned yet",
+    "vehicle": "Vehicle",
+    "capacity": "Capacity",
+    "distance": "Distance",
+    "eta": "ETA",
+    "arriving_now": "Arriving Now!",
+    "call_driver": "Call Driver",
+    "message": "Message",
+    "driver_arrived_msg": "Your driver has arrived! Please wait outside.",
+    "reviews": "reviews",
+    "loading_location": "Getting your location...",
+    "center_map": "Center on my location",
+    "zoom_in": "Zoom in",
+    "error_loading": "Failed to load trip details",
+    "retry": "Retry",
+    "status": {
+      "pending": "Waiting for driver",
+      "assigned": "Driver assigned",
+      "en_route": "Driver is coming",
+      "arrived": "Driver arrived",
+      "to_site": "En route to dive site",
+      "completed": "Trip completed"
+    }
+  }
+}

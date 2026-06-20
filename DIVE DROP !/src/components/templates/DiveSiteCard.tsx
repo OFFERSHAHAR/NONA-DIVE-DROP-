@@ -1,6 +1,7 @@
 import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import clsx from 'clsx';
+import { AppIcon } from '@/components/AppIcon';
 
 /**
  * DiveSiteCard - Responsive dive site card component
@@ -65,17 +66,7 @@ const StarRating = ({ rating, reviewCount }: { rating: number; reviewCount: numb
   <div className="flex items-center gap-2">
     <div className="flex items-center gap-1">
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg
-          key={i}
-          className={clsx('h-4 w-4 transition-colors', {
-            'fill-yellow-400 text-yellow-400': i < Math.floor(rating),
-            'fill-gray-300 text-gray-300 dark:fill-gray-600 dark:text-gray-600': i >= Math.floor(rating),
-          })}
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-        >
-          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-        </svg>
+        <AppIcon key={i} name={i < Math.floor(rating) ? 'star-filled' : 'star'} className={clsx('h-4 w-4 transition-colors', i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600')} />
       ))}
     </div>
     <span className="text-sm font-medium text-text-secondary dark:text-text-secondary-dark">
@@ -132,15 +123,7 @@ export const DiveSiteCard = React.forwardRef<HTMLDivElement, DiveSiteCardProps>(
             aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
             className="absolute left-3 top-3 rounded-full bg-white/90 p-2 text-red-500 transition-all hover:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 dark:bg-gray-900/90 dark:hover:bg-gray-900"
           >
-            <svg
-              className={clsx('h-5 w-5 transition-all', {
-                'fill-current': isFavorited,
-                'fill-none stroke-current stroke-2': !isFavorited,
-              })}
-              viewBox="0 0 24 24"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
+            <AppIcon name={isFavorited ? 'heart-filled' : 'heart'} className="h-5 w-5" />
           </button>
         </div>
 

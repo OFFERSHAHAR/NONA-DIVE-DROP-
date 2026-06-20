@@ -7,6 +7,7 @@ import { Card, CardBody } from '@/components/Card';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { BottomNavigation, BottomNavigationPresets } from '@/components/templates/BottomNavigation';
+import { AppIcon } from '@/components/AppIcon';
 import type { Database } from '@/types/supabase';
 
 type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
@@ -110,7 +111,7 @@ export default function ExploreClient({
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 text-text-tertiary hover:text-text-primary transition-colors"
                 aria-label={t('common.cancel')}
               >
-                ✕
+                <AppIcon name="x" className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -139,7 +140,7 @@ export default function ExploreClient({
                       : 'bg-white border border-border-primary text-text-primary hover:border-primary'
                   }`}
                 >
-                  {getDifficultyIcon(difficulty)} {t(`explore.difficulty_${difficulty}`)}
+                  <i className={`inline-block h-2.5 w-2.5 rounded-full ${getDifficultyDotClass(difficulty)}`} /> {t(`explore.difficulty_${difficulty}`)}
                 </button>
               ))}
             </div>
@@ -179,7 +180,7 @@ export default function ExploreClient({
         {/* Empty State */}
         {!error && filteredSites.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 px-4">
-            <div className="text-6xl mb-4">🔍</div>
+            <AppIcon name="search" className="mb-4 h-16 w-16 text-blue-600" />
             <h2 className="text-2xl font-bold text-text-primary mb-2 text-center">
               {t('explore.no_sites_found')}
             </h2>
@@ -236,16 +237,16 @@ function getDifficultyBadgeClass(difficulty: Difficulty): string {
   }
 }
 
-function getDifficultyIcon(difficulty: Difficulty): string {
+function getDifficultyDotClass(difficulty: Difficulty): string {
   switch (difficulty) {
     case 'easy':
-      return '🟢';
+      return 'bg-emerald-500';
     case 'intermediate':
-      return '🟡';
+      return 'bg-amber-500';
     case 'hard':
-      return '🔴';
+      return 'bg-red-500';
     default:
-      return '🔵';
+      return 'bg-blue-500';
   }
 }
 
@@ -275,19 +276,6 @@ function DiveSiteCard({ site, locale, isRTL }: DiveSiteCardProps) {
     }
   };
 
-  const getDifficultyIconCard = (difficulty: Difficulty): string => {
-    switch (difficulty) {
-      case 'easy':
-        return '🟢';
-      case 'intermediate':
-        return '🟡';
-      case 'hard':
-        return '🔴';
-      default:
-        return '🔵';
-    }
-  };
-
   return (
     <Link href={`/${locale}/explore/${site.id}`}>
       <Card
@@ -308,7 +296,7 @@ function DiveSiteCard({ site, locale, isRTL }: DiveSiteCardProps) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-primary/20 to-accent/20">
-              🌊
+              <AppIcon name="waves" className="h-12 w-12 text-cyan-500" />
             </div>
           )}
 
@@ -319,7 +307,7 @@ function DiveSiteCard({ site, locale, isRTL }: DiveSiteCardProps) {
                 site.difficulty as Difficulty
               )} bg-white/90 backdrop-blur-sm shadow-elevation-2`}
             >
-              <span>{getDifficultyIconCard(site.difficulty as Difficulty)}</span>
+              <i className={`h-2.5 w-2.5 rounded-full ${getDifficultyDotClass(site.difficulty as Difficulty)}`} />
               <span className="hidden sm:inline">{t(`explore.difficulty_${site.difficulty}`)}</span>
             </span>
           </div>
@@ -334,7 +322,7 @@ function DiveSiteCard({ site, locale, isRTL }: DiveSiteCardProps) {
 
           {/* Location with icon */}
           <div className="flex items-start gap-2">
-            <span className="text-lg mt-0.5 flex-shrink-0">📍</span>
+            <AppIcon name="location" className="mt-0.5 h-5 w-5 text-blue-600" />
             <p className="text-xs sm:text-sm text-text-secondary dark:text-text-secondary-light break-words">
               {site.location}
             </p>
@@ -342,7 +330,7 @@ function DiveSiteCard({ site, locale, isRTL }: DiveSiteCardProps) {
 
           {/* Depth info */}
           <div className="flex items-center gap-2 sm:gap-3 py-2 sm:py-3 px-3 sm:px-4 bg-bg-secondary dark:bg-dark-surface-elevated rounded-md border border-border-primary dark:border-border-dark">
-            <span className="text-base sm:text-lg flex-shrink-0">🌊</span>
+            <AppIcon name="depth" className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
             <div className="flex-1">
               <p className="text-xs text-text-tertiary dark:text-text-secondary">{t('explore.max_depth')}</p>
               <p className="text-sm sm:text-base font-semibold text-text-primary dark:text-text-light">
@@ -382,7 +370,7 @@ function DiveSiteCard({ site, locale, isRTL }: DiveSiteCardProps) {
             }}
             className="px-2"
           >
-            ❤️
+            <AppIcon name="heart" className="h-5 w-5" />
           </Button>
         </div>
       </Card>

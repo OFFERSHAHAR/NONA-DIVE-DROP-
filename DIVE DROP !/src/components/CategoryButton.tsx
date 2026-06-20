@@ -1,9 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
+import { AppIcon, type AppIconName } from './AppIcon';
 
 export interface CategoryButtonProps {
-  icon: string;
+  icon: AppIconName;
   label: string;
   href: string;
   onClick?: () => void;
@@ -39,9 +40,7 @@ export const CategoryButton = React.forwardRef<HTMLAnchorElement, CategoryButton
         tabIndex={0}
       >
         {/* Icon */}
-        <span className={clsx('text-4xl sm:text-5xl lg:text-6xl transition-transform duration-200')}>
-          {icon}
-        </span>
+        <AppIcon name={icon} className="h-10 w-10 text-white transition-transform duration-200 sm:h-12 sm:w-12" />
 
         {/* Label */}
         <span
@@ -62,7 +61,7 @@ CategoryButton.displayName = 'CategoryButton';
 
 export interface CategoryGridProps {
   categories: Array<{
-    icon: string;
+    icon: AppIconName;
     label: string;
     href: string;
   }>;

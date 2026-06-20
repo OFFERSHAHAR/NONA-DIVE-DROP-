@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { AppIcon, type AppIconName } from './AppIcon';
 
 export interface DiveSiteCardProps {
   name: string;
@@ -38,22 +39,26 @@ const difficultyConfig = {
 
 const badgeConfig = {
   match: {
-    label: '✓ מתאים לך',
+    label: 'מתאים לך',
+    icon: 'award' as AppIconName,
     bgColor: 'bg-green-500 dark:bg-green-600',
     textColor: 'text-white',
   },
   popular: {
-    label: '🔥 פופולרי היום',
+    label: 'פופולרי היום',
+    icon: 'star-filled' as AppIconName,
     bgColor: 'bg-orange-500 dark:bg-orange-600',
     textColor: 'text-white',
   },
   guided: {
-    label: '👤 עם מדריך מומלץ',
+    label: 'עם מדריך מומלץ',
+    icon: 'user' as AppIconName,
     bgColor: 'bg-purple-500 dark:bg-purple-600',
     textColor: 'text-white',
   },
   required: {
-    label: '⚠️ מחייב מדריך',
+    label: 'מחייב מדריך',
+    icon: 'award' as AppIconName,
     bgColor: 'bg-red-500 dark:bg-red-600',
     textColor: 'text-white',
   },
@@ -111,7 +116,7 @@ export const DiveSiteCard = React.forwardRef<HTMLDivElement, DiveSiteCardProps>(
                 badgeData.textColor
               )}
             >
-              {badgeData.label}
+              <span className="flex items-center gap-1.5"><AppIcon name={badgeData.icon} className="h-4 w-4" />{badgeData.label}</span>
             </div>
           )}
 
@@ -128,16 +133,7 @@ export const DiveSiteCard = React.forwardRef<HTMLDivElement, DiveSiteCardProps>(
                 : 'bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700'
             )}
           >
-            <svg
-              className={clsx('h-5 w-5', {
-                'fill-current': isFavorite,
-                'fill-none stroke-current stroke-2': !isFavorite,
-              })}
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
+            <AppIcon name={isFavorite ? 'heart-filled' : 'heart'} className="h-5 w-5" />
           </button>
         </div>
 
@@ -170,14 +166,14 @@ export const DiveSiteCard = React.forwardRef<HTMLDivElement, DiveSiteCardProps>(
           {/* Duration */}
           {duration && (
             <div className={clsx('flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400')}>
-              <span>{duration} דק&apos; מהמרכז 🚗</span>
+              <AppIcon name="van" className="h-4 w-4" /><span>{duration} דק&apos; מהמרכז</span>
             </div>
           )}
 
           {/* Rating and Reviews */}
           {rating && reviews !== undefined && (
             <div className="flex items-center gap-1 text-sm">
-              <span className="text-yellow-500">⭐</span>
+              <AppIcon name="star-filled" className="h-4 w-4 text-yellow-500" />
               <span className="font-semibold text-slate-900 dark:text-white">
                 {rating.toFixed(1)}
               </span>

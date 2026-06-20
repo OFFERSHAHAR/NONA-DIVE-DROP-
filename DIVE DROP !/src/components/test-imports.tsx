@@ -18,7 +18,7 @@ const testDiveSiteCard: React.ComponentProps<typeof DiveSiteCard> = {
 };
 
 const testCategoryButton: React.ComponentProps<typeof CategoryButton> = {
-  icon: '🪸',
+  icon: 'coral',
   label: 'אתרי צלילה',
   href: '/en/explore',
 };
