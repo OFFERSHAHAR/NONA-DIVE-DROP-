@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
@@ -149,7 +151,7 @@ export const BottomNavigation = React.forwardRef<HTMLElement, BottomNavigationPr
           role="navigation"
           aria-label="Main navigation"
           className={clsx(
-            'fixed bottom-0 left-0 right-0 z-40 border-t border-border-primary bg-card dark:border-border-secondary dark:bg-card-dark',
+            'fixed bottom-0 left-0 right-0 z-40 border-t border-border-primary bg-white/95 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-border-secondary dark:bg-dark-surface/95',
             'md:hidden', // Hide on tablet/desktop
             className
           )}
@@ -157,15 +159,12 @@ export const BottomNavigation = React.forwardRef<HTMLElement, BottomNavigationPr
             paddingBottom: `calc(${safeAreaInsets.bottom}px + env(safe-area-inset-bottom))`,
           }}
         >
-          <ul className="flex h-[60px] items-stretch sm:h-[64px]">
+          <ul className="flex h-[68px] items-stretch sm:h-[72px]">
             {items.map((item) => (
               <li key={item.id} className="relative flex-1">
-                <a
+                <Link
                   href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNavigate?.(item.id);
-                  }}
+                  onClick={() => onNavigate?.(item.id)}
                   aria-current={activeId === item.id ? 'page' : undefined}
                   aria-label={item.ariaLabel || item.label}
                   className={clsx(
@@ -190,7 +189,7 @@ export const BottomNavigation = React.forwardRef<HTMLElement, BottomNavigationPr
 
                   {/* Label - show on mobile, responsive on larger screens */}
                   {responsiveShowLabels && (
-                    <span className="text-xs font-semibold transition-colors duration-200 sm:text-sm">
+                    <span className="max-w-full truncate whitespace-nowrap text-[10px] font-semibold transition-colors duration-200 sm:text-xs">
                       {item.label}
                     </span>
                   )}
@@ -199,14 +198,14 @@ export const BottomNavigation = React.forwardRef<HTMLElement, BottomNavigationPr
                   {activeId === item.id && (
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary transition-all duration-200" />
                   )}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
         </nav>
 
         {/* Bottom spacing placeholder for fixed nav */}
-        <div className="h-[60px] sm:h-[64px] md:hidden" />
+        <div className="h-[68px] sm:h-[72px] md:hidden" />
       </>
     );
   }
@@ -223,7 +222,7 @@ export const BottomNavigationPresets = {
     return [
       {
         id: 'explore',
-        label: isRTL ? '🔍 גילוי' : '🔍 Explore',
+        label: isRTL ? '🔍' : '🔍',
         href: `/${locale}/explore`,
         ariaLabel: isRTL ? 'גלה אתרי צלילה' : 'Explore dive sites',
         icon: (
@@ -233,10 +232,10 @@ export const BottomNavigationPresets = {
         ),
       },
       {
-        id: 'messages',
-        label: isRTL ? '💬 הודעות' : '💬 Messages',
-        href: `/${locale}/messages`,
-        ariaLabel: isRTL ? 'הודעות' : 'Messages',
+        id: 'my-dives',
+        label: isRTL ? '🤿' : '🤿',
+        href: `/${locale}/my-dives`,
+        ariaLabel: isRTL ? 'הצלילות שלי' : 'My dives',
         badge: 0,
         icon: (
           <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -246,7 +245,7 @@ export const BottomNavigationPresets = {
       },
       {
         id: 'home',
-        label: isRTL ? '🏠 בית' : '🏠 Home',
+        label: isRTL ? '🏠' : '🏠',
         href: `/${locale}`,
         ariaLabel: isRTL ? 'דף הבית' : 'Home',
         icon: (
@@ -256,10 +255,10 @@ export const BottomNavigationPresets = {
         ),
       },
       {
-        id: 'bookings',
-        label: isRTL ? '📅 הזמנות' : '📅 Bookings',
-        href: `/${locale}/bookings`,
-        ariaLabel: isRTL ? 'ההזמנות שלי' : 'My bookings',
+        id: 'dashboard',
+        label: isRTL ? '📊' : '📊',
+        href: `/${locale}/dashboard`,
+        ariaLabel: isRTL ? 'לוח בקרה' : 'Dashboard',
         icon: (
           <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.08-2.51c-.29-.35-.77-.35-1.06 0-.29.35-.29.93 0 1.28l2.61 3.13c.29.35.77.35 1.06 0l3.28-4.21c.29-.35.29-.93 0-1.28-.29-.36-.77-.36-1.06-.01z" />
@@ -268,7 +267,7 @@ export const BottomNavigationPresets = {
       },
       {
         id: 'profile',
-        label: isRTL ? '👤 פרופיל' : '👤 Profile',
+        label: isRTL ? '👤' : '👤',
         href: `/${locale}/profile`,
         ariaLabel: isRTL ? 'הפרופיל שלי' : 'My profile',
         icon: (
