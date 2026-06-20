@@ -208,6 +208,21 @@ export async function confirmPayment(
           completed_at: new Date().toISOString(),
         })
         .eq('id', confirmation.package_id);
+
+      // Trigger webhook (fire and forget)
+      const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/webhooks/package-completed`;
+
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-webhook-signature': process.env.WEBHOOK_SECRET || '',
+        },
+        body: JSON.stringify({
+          package_id: confirmation.package_id,
+          event: 'package_completed',
+        }),
+      }).catch(err => console.error('Webhook trigger failed:', err));
     }
 
     return updated;
