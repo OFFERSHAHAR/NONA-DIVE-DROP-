@@ -21,6 +21,14 @@ export const Header: React.FC<HeaderProps> = ({
   const locale = useLocale();
   const isRTL = locale === 'he';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigationItems = [
+    { href: `/${locale}`, icon: '🏠', label: isRTL ? 'דף הבית' : 'Home' },
+    { href: `/${locale}/explore`, icon: '🔍', label: isRTL ? 'גילוי אתרי צלילה' : 'Explore' },
+    { href: `/${locale}/my-dives`, icon: '🤿', label: isRTL ? 'הצלילות שלי' : 'My Dives' },
+    { href: `/${locale}/dashboard`, icon: '📊', label: isRTL ? 'לוח בקרה' : 'Dashboard' },
+    { href: `/${locale}/profile`, icon: '👤', label: isRTL ? 'פרופיל' : 'Profile' },
+    { href: `/${locale}/settings`, icon: '⚙️', label: isRTL ? 'הגדרות' : 'Settings' },
+  ];
 
   const handleMenuClick = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -64,15 +72,15 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex-1 flex items-center justify-center gap-2 sm:gap-3 group"
           >
             {/* Logo Icon */}
-            <div className="text-2xl sm:text-3xl">📍</div>
+            <div className="flex h-11 w-9 items-center justify-center rounded-[45%_45%_55%_55%] bg-gradient-to-b from-cyan-400 to-blue-800 text-xl text-white shadow-md">🌊</div>
 
             {/* Brand Text */}
             <div className={`hidden sm:flex flex-col gap-0 ${isRTL ? 'text-right' : 'text-left'}`}>
-              <div className="font-bold text-sm sm:text-base text-primary dark:text-cyan-accent">
+              <div className="text-lg font-extrabold tracking-tight text-primary dark:text-cyan-accent">
                 {isRTL ? 'DiveDrop' : 'DiveDrop'}
               </div>
               <div className="text-xs text-text-secondary dark:text-text-secondary-light leading-tight">
-                {isRTL ? 'צלול יותר. דאג יותר.' : 'Dive More. Care More.'}
+                {isRTL ? 'DIVE MORE. CARE MORE.' : 'DIVE MORE. CARE MORE.'}
               </div>
             </div>
           </Link>
@@ -109,12 +117,56 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Header Spacing Placeholder */}
       <div className="h-16" />
 
-      {/* Mobile Menu Overlay (optional) */}
+      {/* Navigation drawer */}
       {isMenuOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
-          onClick={() => setIsMenuOpen(false)}
-        />
+        <>
+          <button
+            type="button"
+            aria-label={isRTL ? 'סגירת תפריט' : 'Close menu'}
+            className="fixed inset-0 z-40 bg-black/45"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <aside
+            className={clsx(
+              'fixed top-0 z-[60] flex h-full w-[min(84vw,320px)] flex-col bg-white p-5 shadow-2xl dark:bg-dark-surface',
+              isRTL ? 'right-0' : 'left-0'
+            )}
+            aria-label={isRTL ? 'ניווט ראשי' : 'Main navigation'}
+          >
+            <div className="mb-6 flex items-center justify-between border-b border-border-primary pb-4 dark:border-border-dark">
+              <div>
+                <div className="text-xl font-bold text-primary">DiveDrop</div>
+                <div className="text-sm text-text-secondary">
+                  {isRTL ? 'ניווט באתר' : 'Site navigation'}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(false)}
+                className="rounded-lg p-2 text-2xl hover:bg-bg-secondary"
+                aria-label={isRTL ? 'סגירה' : 'Close'}
+              >
+                ×
+              </button>
+            </div>
+            <nav className="border-0 bg-transparent">
+              <ul className="space-y-2">
+                {navigationItems.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-primary/10 hover:text-primary dark:text-text-light"
+                    >
+                      <span aria-hidden="true">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        </>
       )}
     </>
   );

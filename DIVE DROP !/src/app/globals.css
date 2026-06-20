@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../../tailwind.config.js";
+@import "tailwindcss";
 
 /* Safe area support for notch/Dynamic Island */
 @supports (padding: max(0px)) {

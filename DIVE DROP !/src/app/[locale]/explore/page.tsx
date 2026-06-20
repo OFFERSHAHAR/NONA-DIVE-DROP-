@@ -5,8 +5,6 @@ import { getLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/Button';
 import { Card, CardBody } from '@/components/Card';
-import { Header } from '@/components/Header';
-import { BottomNavigation, BottomNavigationPresets } from '@/components/templates/BottomNavigation';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/supabase';
 
@@ -33,12 +31,10 @@ export default async function ExplorePage() {
   const isRTL = locale === 'he';
 
   return (
-    <div className={`min-h-screen w-full bg-light-bg dark:bg-dark-bg ${isRTL ? 'rtl' : 'ltr'}`}>
-      <Header />
-
-      <div className="pt-8 px-4 sm:px-6 max-w-6xl mx-auto pb-20">
+    <div className={`min-h-screen w-full bg-[#f6f9fd] dark:bg-dark-bg ${isRTL ? 'rtl' : 'ltr'}`}>
+      <div className="mx-auto max-w-5xl px-4 pb-24 pt-6 sm:px-6">
         {/* Header Section */}
-        <div className={`flex items-center justify-between gap-4 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="mb-6 flex items-center justify-between gap-4">
           <div className="flex-1">
             <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <Link
@@ -92,7 +88,7 @@ export default async function ExplorePage() {
         </div>
 
         {/* Search Input */}
-        <div className="mb-6">
+        <div className="mb-5 rounded-2xl bg-white p-2 shadow-sm">
           <div className="relative">
             <svg
               className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary dark:text-text-secondary-light"
@@ -110,7 +106,7 @@ export default async function ExplorePage() {
             <input
               type="text"
               placeholder={t('search_placeholder')}
-              className="w-full pl-12 pr-4 py-3 rounded-lg border border-border-primary dark:border-border-dark bg-white dark:bg-dark-surface text-text-primary dark:text-text-light placeholder-text-secondary dark:placeholder-text-secondary-light focus:border-primary dark:focus:border-cyan-accent focus:ring-1 focus:ring-primary dark:focus:ring-cyan-accent"
+              className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-text-primary shadow-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
@@ -138,7 +134,7 @@ export default async function ExplorePage() {
 
         {/* Dive Sites Grid */}
         {diveSites.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {diveSites.map((site) => (
               <DiveSiteCardExplore key={site.id} site={site} locale={locale} isRTL={isRTL} />
             ))}
@@ -152,11 +148,6 @@ export default async function ExplorePage() {
           </div>
         )}
 
-        {/* Bottom Navigation */}
-        <BottomNavigation
-          items={BottomNavigationPresets.diveDropMain('explore', locale)}
-          activeId="explore"
-        />
       </div>
     </div>
   );
@@ -173,22 +164,16 @@ function DiveSiteCardExplore({ site, locale, isRTL }: DiveSiteCardExploreProps) 
     <Card
       variant="default"
       hover={true}
-      className="h-full overflow-hidden cursor-pointer group transition-all hover:shadow-lg"
+      className="h-full overflow-hidden cursor-pointer group rounded-[22px] border-0 bg-white p-0 transition-all hover:-translate-y-1 hover:shadow-xl"
     >
       {/* Image Container */}
       <div className="w-full aspect-video bg-gradient-to-br from-accent/30 to-primary/30 overflow-hidden relative">
-        {site.image_url ? (
-          <img
-            src={site.image_url}
-            alt={site.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-primary/20 to-accent/20">
-            🌊
-          </div>
-        )}
+        <img
+          src={site.image_url || getDiveSiteImage(site.name)}
+          alt={site.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+        />
 
         {/* Difficulty Badge */}
         <div className={`absolute top-3 ${isRTL ? 'right-3' : 'left-3'}`}>
@@ -268,4 +253,12 @@ function getDifficultyIcon(difficulty: string): string {
     hard: '🔴',
   };
   return icons[difficulty as keyof typeof icons] || '🔵';
+}
+
+function getDiveSiteImage(name: string): string {
+  const normalized = name.toLowerCase();
+  if (normalized.includes('blue hole')) return 'https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=1000&h=650&fit=crop';
+  if (normalized.includes('palau')) return 'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1000&h=650&fit=crop';
+  if (normalized.includes('barrier')) return 'https://images.unsplash.com/photo-1530053969600-caed2596d242?w=1000&h=650&fit=crop';
+  return 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1000&h=650&fit=crop';
 }

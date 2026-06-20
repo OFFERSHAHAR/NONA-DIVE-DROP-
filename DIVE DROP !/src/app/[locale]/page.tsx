@@ -5,8 +5,6 @@ import { getLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/Button';
 import { Card, CardBody } from '@/components/Card';
-import { Header } from '@/components/Header';
-import { BottomNavigation, BottomNavigationPresets } from '@/components/templates/BottomNavigation';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/supabase';
 
@@ -35,22 +33,20 @@ export default async function HomePage() {
   const isRTL = locale === 'he';
 
   return (
-    <div className={`min-h-screen w-full bg-light-bg dark:bg-dark-bg ${isRTL ? 'rtl' : 'ltr'}`}>
-      <Header />
-
-      <div className="flex flex-col lg:flex-row gap-6 pt-8 px-4 sm:px-6 max-w-7xl mx-auto pb-20">
+    <div className={`min-h-screen w-full bg-[#f6f9fd] dark:bg-dark-bg ${isRTL ? 'rtl' : 'ltr'}`}>
+      <div className="mx-auto flex max-w-[1500px] flex-col gap-5 px-4 pb-20 pt-4 sm:px-6 lg:flex-row-reverse lg:pt-6">
         {/* LEFT COLUMN: 70% on desktop */}
         <div className="w-full lg:w-[70%]">
           {/* Hero Section with Split Image */}
-          <section className="relative w-full h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden mb-8 shadow-lg">
+          <section className="relative mb-0 h-[420px] w-full overflow-hidden rounded-[26px] shadow-xl sm:h-[500px] lg:h-[560px]">
             <img
               src="https://images.unsplash.com/photo-1682687982501-1e58ab814714?w=1200&h=800&fit=crop"
               alt={isRTL ? 'צלילה' : 'Diving'}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
             {/* Text Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex flex-col justify-end p-6 sm:p-8">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">
+            <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#001d49]/95 via-[#003b75]/20 to-transparent p-7 sm:p-10 lg:items-end lg:justify-center lg:text-right">
+              <h1 className="mb-3 break-words text-2xl font-bold text-white sm:text-4xl md:text-5xl">
                 {isRTL ? 'ברוך הבא ל-DiveDrop' : 'Welcome to DiveDrop'}
               </h1>
               <p className="text-base sm:text-lg text-white/95 max-w-2xl leading-relaxed">
@@ -62,30 +58,32 @@ export default async function HomePage() {
           </section>
 
           {/* Category Buttons Row */}
-          <section className="mb-8">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <section className="relative z-10 mx-4 -mt-12 mb-10 rounded-[26px] bg-white p-3 shadow-xl sm:mx-8 sm:p-4 lg:mx-10 lg:-mt-28 lg:bg-white/15 lg:backdrop-blur-md">
+            <div className="grid grid-cols-3 gap-2 lg:grid-cols-5">
               {[
-                { icon: '🪸', label: isRTL ? 'אתרי צלילה' : 'Dive Sites' },
-                { icon: '🏛️', label: isRTL ? 'מועדוני צלילה' : 'Dive Clubs' },
-                { icon: '👤', label: isRTL ? 'מדריכים' : 'Instructors' },
-                { icon: '🚐', label: isRTL ? 'הסעות' : 'Pickups' },
-                { icon: '⛵', label: isRTL ? 'צלילות סירה' : 'Boat Dives' },
+                { icon: '🪸', label: isRTL ? 'אתרי צלילה' : 'Dive Sites', href: `/${locale}/explore?category=sites` },
+                { icon: '🏛️', label: isRTL ? 'מועדוני צלילה' : 'Dive Clubs', href: `/${locale}/explore?category=clubs` },
+                { icon: '👤', label: isRTL ? 'מדריכים' : 'Instructors', href: `/${locale}/explore?category=instructors` },
+                { icon: '🚐', label: isRTL ? 'הסעות' : 'Pickups', href: `/${locale}/explore?category=pickups` },
+                { icon: '⛵', label: isRTL ? 'צלילות סירה' : 'Boat Dives', href: `/${locale}/explore?category=boat` },
+                { icon: '🤿', label: isRTL ? 'צלילות' : 'Dives', href: `/${locale}/my-dives`, mobileOnly: true },
               ].map((cat) => (
-                <button
+                <Link
                   key={cat.label}
-                  className="p-4 rounded-lg bg-white dark:bg-dark-surface border border-border-primary dark:border-border-dark hover:border-primary dark:hover:border-cyan-accent hover:shadow-md transition-all flex flex-col items-center gap-2"
+                  href={cat.href}
+                  className={`flex min-h-[100px] flex-col items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-white to-blue-50 p-3 text-[#062a60] transition-all hover:-translate-y-1 hover:shadow-lg lg:bg-[#003d70]/75 lg:text-white ${cat.mobileOnly ? 'lg:hidden' : ''}`}
                 >
                   <span className="text-2xl sm:text-3xl">{cat.icon}</span>
                   <span className="text-xs sm:text-sm font-semibold text-text-primary dark:text-text-light text-center">
                     {cat.label}
                   </span>
-                </button>
+                </Link>
               ))}
             </div>
           </section>
 
           {/* Recommended Section */}
-          <section className="mb-8">
+          <section className="mb-8 rounded-[26px] bg-white p-4 shadow-sm sm:p-6">
             <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <h2 className="text-2xl sm:text-3xl font-bold text-text-primary dark:text-text-light">
                 {isRTL ? 'מומלץ עבורך ⭐' : 'Recommended for You ⭐'}
@@ -104,22 +102,16 @@ export default async function HomePage() {
                 {diveSites.map((site) => (
                   <div
                     key={site.id}
-                    className="flex-shrink-0 w-64 sm:w-72 rounded-lg overflow-hidden bg-white dark:bg-dark-surface shadow-md hover:shadow-lg transition-shadow"
+                    className="flex-shrink-0 w-64 sm:w-72 rounded-2xl overflow-hidden bg-white border border-slate-100 dark:bg-dark-surface shadow-md hover:shadow-xl transition-shadow"
                   >
                     {/* Image */}
                     <div className="relative w-full h-48 bg-gradient-to-br from-accent/30 to-primary/30 overflow-hidden">
-                      {site.image_url ? (
-                        <img
-                          src={site.image_url}
-                          alt={site.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-primary/20 to-accent/20">
-                          🌊
-                        </div>
-                      )}
+                      <img
+                        src={site.image_url || getDiveSiteImage(site.name)}
+                        alt={site.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        loading="lazy"
+                      />
 
                       {/* Difficulty Badge */}
                       <div className={`absolute top-3 ${isRTL ? 'right-3' : 'left-3'}`}>
@@ -156,8 +148,8 @@ export default async function HomePage() {
         </div>
 
         {/* RIGHT COLUMN: 30% on desktop - Search Panel */}
-        <aside className="w-full lg:w-[30%] hidden md:block sticky top-24 h-fit">
-          <Card variant="elevated" className="p-6 shadow-lg">
+        <aside className="w-full lg:w-[30%] hidden md:block sticky top-20 h-fit">
+          <Card variant="elevated" className="rounded-[26px] border-0 bg-white p-6 shadow-xl">
             {/* Title with Underline */}
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-text-primary dark:text-text-light pb-3 border-b-4 border-primary">
@@ -308,4 +300,12 @@ function getDifficultyIcon(difficulty: string): string {
     hard: '🔴',
   };
   return icons[difficulty as keyof typeof icons] || '🔵';
+}
+
+function getDiveSiteImage(name: string): string {
+  const normalized = name.toLowerCase();
+  if (normalized.includes('blue hole')) return 'https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=900&h=600&fit=crop';
+  if (normalized.includes('palau')) return 'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=900&h=600&fit=crop';
+  if (normalized.includes('barrier')) return 'https://images.unsplash.com/photo-1530053969600-caed2596d242?w=900&h=600&fit=crop';
+  return 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=900&h=600&fit=crop';
 }
