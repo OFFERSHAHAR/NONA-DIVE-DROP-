@@ -94,7 +94,10 @@ CREATE TYPE payment_method AS ENUM (
 -- ============================================================================
 
 -- Service providers (dive centers, instructors, boat operators)
-CREATE TABLE service_providers (
+-- NOTE: If service_providers already exists from 20260620_create_service_provider_directory.sql,
+-- we need to either drop it or merge the schemas. For now, using CREATE TABLE IF NOT EXISTS
+-- and the existing table from 20260620 will be used.
+CREATE TABLE IF NOT EXISTS service_providers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
 
@@ -213,7 +216,7 @@ CREATE INDEX idx_provider_availability_provider_date ON provider_availability(pr
 -- ============================================================================
 
 -- Main booking record
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
   -- Party Information
