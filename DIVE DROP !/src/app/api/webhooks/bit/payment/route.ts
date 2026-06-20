@@ -132,7 +132,7 @@ async function handlePaymentCompleted(supabase: any, event: any) {
 
     // Get booking details
     const { data: booking, error: bookingError } = await supabase
-      .from('dive_bookings')
+      .from('bookings')
       .select('id, diver_id, service_provider_id, status')
       .eq('id', booking_id)
       .single();
@@ -147,7 +147,7 @@ async function handlePaymentCompleted(supabase: any, event: any) {
 
     // Update booking status
     const { error: updateError } = await supabase
-      .from('dive_bookings')
+      .from('bookings')
       .update({
         status: 'confirmed',
         payment_method: 'bit',

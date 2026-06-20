@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     // Get booking
     const { data: booking, error: bookingError } = await supabase
-      .from('dive_bookings')
+      .from('bookings')
       .select(
         'id, diver_id, service_provider_id, amount_cents, status, bit_transaction_id'
       )

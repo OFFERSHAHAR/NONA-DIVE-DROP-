@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     // Verify booking exists and belongs to current user
     const { data: booking, error: bookingError } = await supabase
-      .from('dive_bookings')
+      .from('bookings')
       .select('id, diver_id, service_provider_id, amount_cents, status')
       .eq('id', booking_id)
       .single();
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
 
     // Update booking with payment request reference
     await supabase
-      .from('dive_bookings')
+      .from('bookings')
       .update({
         bit_payment_request_id: paymentRequest.request_id,
       })

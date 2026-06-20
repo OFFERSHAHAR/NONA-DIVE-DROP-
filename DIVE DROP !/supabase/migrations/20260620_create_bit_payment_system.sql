@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS bit_payment_requests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
   -- Booking reference
-  booking_id UUID NOT NULL UNIQUE REFERENCES dive_bookings(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
 
   -- Payment amount (in cents)
   amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS bit_transactions (
 
   -- Transaction identifiers
   bit_transaction_id VARCHAR(100) UNIQUE,
-  booking_id UUID NOT NULL REFERENCES dive_bookings(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
 
   -- Participants
   service_provider_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS bit_refunds (
   -- Refund identifiers
   bit_refund_id VARCHAR(100) NOT NULL UNIQUE,
   bit_transaction_id VARCHAR(100) NOT NULL,
-  booking_id UUID NOT NULL REFERENCES dive_bookings(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
 
   -- Refund amount (in cents)
   amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
@@ -273,7 +273,7 @@ CREATE TABLE IF NOT EXISTS bit_commission_records (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
   -- Booking reference
-  booking_id UUID NOT NULL REFERENCES dive_bookings(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
 
   -- Commission amount (in cents)
   commission_cents INTEGER NOT NULL CHECK (commission_cents > 0),
@@ -377,16 +377,16 @@ CREATE INDEX idx_bit_settlements_date ON bit_settlements(settlement_date DESC);
 CREATE INDEX idx_bit_settlements_status ON bit_settlements(status);
 
 -- ============================================================================
--- UPDATED DIVE_BOOKINGS TABLE (if not already updated)
+-- UPDATED BOOKINGS TABLE (if not already updated)
 -- ============================================================================
--- Add Bit-specific fields to dive_bookings
+-- Add Bit-specific fields to bookings
 
-ALTER TABLE dive_bookings
+ALTER TABLE bookings
 ADD COLUMN IF NOT EXISTS bit_payment_request_id UUID REFERENCES bit_payment_requests(id),
 ADD COLUMN IF NOT EXISTS bit_transaction_id VARCHAR(100) REFERENCES bit_transactions(bit_transaction_id),
 ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50) DEFAULT 'bit' CHECK (payment_method IN ('bit'));
 
-CREATE INDEX idx_dive_bookings_bit_payment_request ON dive_bookings(bit_payment_request_id);
+CREATE INDEX idx_bookings_bit_payment_request ON bookings(bit_payment_request_id);
 
 -- ============================================================================
 -- RLS POLICIES
@@ -419,7 +419,7 @@ CREATE POLICY "Users can view own transactions" ON bit_transactions
 CREATE POLICY "Divers can view own refunds" ON bit_refunds
   FOR SELECT
   USING (booking_id IN (
-    SELECT id FROM dive_bookings WHERE diver_id = auth.uid()
+    SELECT id FROM bookings WHERE diver_id = auth.uid()
   ));
 
 -- Admin policies (handled by auth.uid() = admin check elsewhere)
