@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@/lib/auth/actions';
+import { getCurrentUser } from '@/lib/auth/actions';
 import {
   approveEquipmentRentalSchema,
   returnEquipmentSchema,
@@ -22,10 +22,11 @@ import {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const rental = await getEquipmentRental(params.id);
+    const { id } = await params;
+    const rental = await getEquipmentRental(id);
 
     if (!rental) {
       return NextResponse.json(
@@ -61,11 +62,11 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
-    const auth = await getAuth();
+    const auth = await getCurrentUser();
     if (!auth.user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -76,7 +77,8 @@ export async function POST(
     // Get action from query params
     const action = request.nextUrl.searchParams.get('action');
 
-    const rental = await getEquipmentRental(params.id);
+    const { id } = await params;
+    const rental = await getEquipmentRental(id);
     if (!rental) {
       return NextResponse.json(
         { success: false, error: 'Rental not found' },
@@ -103,7 +105,7 @@ export async function POST(
         );
       }
 
-      const approved = await approveEquipmentRental(params.id, auth.user.id);
+      const approved = await approveEquipmentRental(id, auth.user.id);
 
       return NextResponse.json({
         success: true,
@@ -135,7 +137,7 @@ export async function POST(
       const reason = body.reason || 'No reason provided';
 
       const rejected = await rejectEquipmentRental(
-        params.id,
+        id,
         auth.user.id,
         reason
       );
@@ -169,7 +171,7 @@ export async function POST(
       const body = await request.json();
       const input = returnEquipmentSchema.parse(body);
 
-      const returned = await returnEquipment(params.id, auth.user.id, input);
+      const returned = await returnEquipment(id, auth.user.id, input);
 
       return NextResponse.json({
         success: true,
@@ -200,7 +202,7 @@ export async function POST(
         );
       }
 
-      const completed = await completeEquipmentRental(params.id, auth.user.id);
+      const completed = await completeEquipmentRental(id, auth.user.id);
 
       return NextResponse.json({
         success: true,
