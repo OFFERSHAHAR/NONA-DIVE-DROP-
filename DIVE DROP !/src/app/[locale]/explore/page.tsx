@@ -12,6 +12,7 @@ import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/Button';
 import { Card, CardBody } from '@/components/Card';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
+import { ConditionsDisplay } from '@/components/ConditionsDisplay';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/supabase';
 
@@ -104,11 +105,31 @@ export default async function ExplorePage() {
 
         {/* Dive Sites Grid */}
         {diveSites.length > 0 ? (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {diveSites.map((site) => (
-              <DiveSiteCardExplore key={site.id} site={site} locale={locale} isRTL={isRTL} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {diveSites.map((site) => (
+                <DiveSiteCardExplore key={site.id} site={site} locale={locale} isRTL={isRTL} />
+              ))}
+            </div>
+
+            {/* Conditions Display Section - Show first dive site conditions */}
+            {diveSites.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-border-primary dark:border-border-dark">
+                <h2 className={`text-2xl font-bold text-text-primary dark:text-text-light mb-6 ${isRTL ? 'text-right' : ''}`}>
+                  {isRTL ? 'תנאים זמינים' : 'Conditions Today'}
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {diveSites.slice(0, 2).map((site) => (
+                    <ConditionsDisplay
+                      key={`conditions-${site.id}`}
+                      diveSiteId={site.id}
+                      locale={locale === 'he' ? 'he' : 'en'}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12">
             <AppIcon name="waves" className="mx-auto mb-4 h-16 w-16 text-cyan-500" />

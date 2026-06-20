@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { StatusTracker } from '@/components/bookings/StatusTracker';
 import { ReviewForm } from '@/components/bookings/ReviewForm';
+import { FeedbackCard } from '@/components/FeedbackCard';
 import { formatBookingDate, getStatusLabel, formatDepth, formatTemperature } from '@/lib/bookings/utils';
 
 interface BookingDetailsPageProps {
@@ -374,6 +375,20 @@ export default function BookingDetailsPage({ params }: BookingDetailsPageProps) 
                   }
                   onSubmit={handleSubmitReview}
                   onCancel={() => setShowReviewForm(false)}
+                />
+              </div>
+            )}
+
+            {/* Feedback Card - Show for completed dives */}
+            {booking.status === 'completed' && booking.dive_sites?.id && (
+              <div>
+                <FeedbackCard
+                  diveSiteId={booking.dive_sites.id}
+                  diveBookingId={booking.id}
+                  onSuccess={() => {
+                    // Show success message
+                    console.log('Feedback submitted successfully');
+                  }}
                 />
               </div>
             )}
