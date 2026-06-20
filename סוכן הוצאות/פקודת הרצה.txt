@@ -1,2 +1,0 @@
-cd "C:\Users\GamingPC\Desktop\סוכן הוצאות"
-python run_agent.py
