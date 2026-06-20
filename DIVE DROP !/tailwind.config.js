@@ -40,41 +40,26 @@ export default {
         "border-light": "#D0D5DB",
         "border-dark": "#2A3340",
 
+        // Semantic surface and text tokens. Prefixes prevent collisions with
+        // the primary brand color in Tailwind v4.
+        "bg-primary": "var(--bg-primary, #FFFFFF)",
+        "bg-secondary": "var(--bg-secondary, #F8FAFC)",
+        "bg-tertiary": "var(--bg-tertiary, #E8EEF5)",
+        "text-primary": "var(--text-primary, #0A1428)",
+        "text-secondary": "var(--text-secondary, #5A6370)",
+        "text-tertiary": "var(--text-tertiary, #80878F)",
+        "border-primary": "var(--border-primary, #D0D5DB)",
+        "border-secondary": "var(--border-secondary, #E0E4E8)",
+        success: "var(--color-success, #00C853)",
+        warning: "var(--color-warning, #FFC400)",
+        error: "var(--color-error, #FF3D00)",
+
         // Primary brand colors - using CSS variables from design-system.css
         primary: "var(--color-primary, #0066CC)",
         "primary-dark": "var(--color-primary-dark, #003D8C)",
         "primary-light": "var(--color-primary-light, #1A5FBD)",
         accent: "var(--color-accent, #00BCD4)",
         "accent-light": "var(--color-accent-light, #48D1E0)",
-      },
-
-      textColor: {
-        primary: "var(--text-primary, #0A1428)",
-        secondary: "var(--text-secondary, #5A6370)",
-        tertiary: "var(--text-tertiary, #80878F)",
-      },
-
-      borderColor: {
-        primary: "var(--border-primary, #D0D5DB)",
-        secondary: "var(--border-secondary, #E0E4E8)",
-      },
-
-      backgroundColor: {
-        primary: "var(--bg-primary, #FFFFFF)",
-        secondary: "var(--bg-secondary, #F8FAFC)",
-        tertiary: "var(--bg-tertiary, #E8EEF5)",
-      },
-
-      // Spacing (8px grid) - using CSS variables
-      spacing: {
-        xs: "var(--space-xs, 8px)",
-        sm: "var(--space-sm, 16px)",
-        md: "var(--space-md, 24px)",
-        lg: "var(--space-lg, 32px)",
-        xl: "var(--space-xl, 40px)",
-        "2xl": "var(--space-2xl, 48px)",
-        "3xl": "var(--space-3xl, 64px)",
-        "4xl": "var(--space-4xl, 80px)",
       },
 
       // Border Radius - using CSS variables

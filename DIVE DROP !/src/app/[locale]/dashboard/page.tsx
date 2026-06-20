@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { BottomNavigation, BottomNavigationPresets } from '@/components/templates/BottomNavigation';
 import { LogoutButton } from '@/components/LogoutButton';
+import { AppIcon } from '@/components/AppIcon';
 import Link from 'next/link';
 
 interface DiveStats {
@@ -259,8 +260,8 @@ async function DashboardContent({ locale, userId, userName }: { locale: string; 
                         className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated transition-colors group"
                       >
                         <div className="flex items-center gap-3 sm:gap-4">
-                          <div className="text-2xl sm:text-3xl group-hover:scale-125 transition-transform flex-shrink-0">
-                            {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '🤿'}
+                          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-700 transition-transform group-hover:scale-110">
+                            <AppIcon name={idx < 3 ? 'award' : 'diver'} className="h-5 w-5" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-text-primary dark:text-text-light text-sm sm:text-base truncate">
@@ -284,7 +285,7 @@ async function DashboardContent({ locale, userId, userName }: { locale: string; 
                   </div>
                 ) : (
                   <div className="px-4 sm:px-6 py-12 sm:py-16 text-center">
-                    <div className="text-5xl sm:text-6xl mb-4">🤿</div>
+                    <AppIcon name="diver" className="mx-auto mb-4 h-14 w-14 text-blue-600" />
                     <p className="text-text-secondary dark:text-text-secondary-light mb-6 text-sm sm:text-base font-medium">
                       No dives logged yet
                     </p>
@@ -301,7 +302,7 @@ async function DashboardContent({ locale, userId, userName }: { locale: string; 
             {/* Latest Dive Info */}
             {stats.latestDiveDate && (
               <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-primary/10 dark:to-accent/10 rounded-lg border border-blue-200 dark:border-blue-800 flex items-center gap-3 sm:gap-4">
-                <div className="text-3xl sm:text-4xl flex-shrink-0">✨</div>
+                <AppIcon name="star-filled" className="h-9 w-9 flex-shrink-0 text-cyan-500" />
                 <div>
                   <p className="text-xs text-text-secondary dark:text-text-secondary-light font-medium uppercase tracking-wide">
                     Last Dive
@@ -335,9 +336,7 @@ async function DashboardContent({ locale, userId, userName }: { locale: string; 
                     <div key={site.id} className="border-b border-border-primary dark:border-border-dark last:border-b-0">
                       <div className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated transition-colors group cursor-pointer">
                         <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
-                          <div className="text-lg sm:text-xl flex-shrink-0 mt-0.5">
-                            {idx === 0 ? '⭐' : idx === 1 ? '✨' : '🌟'}
-                          </div>
+                          <AppIcon name={idx === 0 ? 'star-filled' : 'star'} className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500" />
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-text-primary dark:text-text-light text-sm sm:text-base leading-tight line-clamp-2">
                               {site.name}
@@ -355,8 +354,8 @@ async function DashboardContent({ locale, userId, userName }: { locale: string; 
                           >
                             {site.difficulty}
                           </span>
-                          <span className="text-xs text-text-secondary dark:text-text-secondary-light font-medium">
-                            🌊 {site.depth}m
+                          <span className="flex items-center gap-1 text-xs font-medium text-text-secondary dark:text-text-secondary-light">
+                            <AppIcon name="depth" className="h-4 w-4" />{site.depth}m
                           </span>
                         </div>
                         <Link href={`/${locale}/explore`} className="w-full">

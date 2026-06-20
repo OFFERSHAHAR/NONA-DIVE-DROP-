@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="72" viewBox="0 0 340 72" fill="none">
+
+  <defs>
+    <clipPath id="w-clip"><circle cx="32" cy="29" r="21"></circle></clipPath>
+  </defs>
+  <g transform="translate(0,4)">
+    <path d="M32 3C18.7 3 8 13.5 8 26.4 8 41.7 27 58 31 61.2a1.6 1.6 0 0 0 2 0C37 58 56 41.7 56 26.4 56 13.5 45.3 3 32 3z" fill="#FFFFFF"></path>
+    <g clip-path="url(#w-clip)">
+      <circle cx="32" cy="29" r="21" fill="#0A2647"></circle>
+      <path d="M20 28.8h13l-1.6 2.4a1 1 0 0 1-.85.45H22.5a1 1 0 0 1-.86-.5L20 28.8z" fill="#FFFFFF"></path>
+      <path d="M22 28.4v-3.1l8-1.1 2.6 4.2z" fill="#FFFFFF" opacity="0.7"></path>
+      <path d="M11 30.4h42" stroke="#FFFFFF" stroke-width="1" opacity="0.6"></path>
+      <path d="M16 53v-6c0-2 1.4-2.6 1.4-4.4a1.4 1.4 0 1 0-2.8 0c0 1.8 1.4 2.4 1.4 4.4M46 52v-5c0-1.5 1.2-2 1.2-3.5a1.2 1.2 0 1 0-2.4 0c0 1.5 1.2 2 1.2 3.5" fill="#FFFFFF" opacity="0.7"></path>
+    </g>
+  </g>
+  <g transform="translate(82,12)">
+    <text x="0" y="33" font-family="&#39;Poppins&#39;,&#39;Segoe UI&#39;,sans-serif" font-size="40" font-weight="700" letter-spacing="-1" fill="#FFFFFF">DiveDrop</text>
+    <text x="2" y="51" font-family="&#39;Poppins&#39;,&#39;Segoe UI&#39;,sans-serif" font-size="11.5" font-weight="600" letter-spacing="3.2" fill="#9BD3EE">DIVE MORE. CARE MORE.</text>
+  </g>
+
+</svg>

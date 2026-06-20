@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { PerfectDayAnswers, DivePlan, ExperienceLevel, DiveGoal, GuidePreference } from '@/types/agent'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
+import { AppIcon } from '@/components/AppIcon'
 
 interface PerfectDayWidgetProps {
   userExperience?: ExperienceLevel
@@ -279,8 +280,8 @@ export default function PerfectDayWidget({ userExperience = 'beginner', locale }
                 {plan.siteDifficulty}
               </span>
             </div>
-            <p className="text-body text-text-secondary dark:text-text-secondary">
-              📍 {plan.siteLocation}
+            <p className="flex items-center gap-2 text-body text-text-secondary dark:text-text-secondary">
+              <AppIcon name="location" className="h-4 w-4" />{plan.siteLocation}
             </p>
           </div>
 

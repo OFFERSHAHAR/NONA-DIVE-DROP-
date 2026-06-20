@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
 import { Button } from './Button';
+import { AppIcon } from './AppIcon';
 
 export interface SearchFilters {
   location?: string;
@@ -89,7 +90,7 @@ export const SearchPanel = React.forwardRef<HTMLDivElement, SearchPanelProps>(
         <div id={`tab-${activeTab}`} role="tabpanel" className="flex flex-col gap-4">
           {/* Location Dropdown */}
           <div className={clsx('flex items-center gap-2', isRTL ? 'flex-row-reverse' : '')}>
-            <span className="text-lg">📍</span>
+            <AppIcon name="location" className="h-5 w-5 text-blue-600" />
             <select
               value={filters.location || ''}
               onChange={(e) => setFilters({ ...filters, location: e.target.value })}
@@ -115,7 +116,7 @@ export const SearchPanel = React.forwardRef<HTMLDivElement, SearchPanelProps>(
 
           {/* Date Dropdown */}
           <div className={clsx('flex items-center gap-2', isRTL ? 'flex-row-reverse' : '')}>
-            <span className="text-lg">📅</span>
+            <AppIcon name="calendar" className="h-5 w-5 text-blue-600" />
             <input
               type="date"
               value={filters.date || ''}
@@ -134,7 +135,7 @@ export const SearchPanel = React.forwardRef<HTMLDivElement, SearchPanelProps>(
 
           {/* Dive Level Dropdown */}
           <div className={clsx('flex items-center gap-2', isRTL ? 'flex-row-reverse' : '')}>
-            <span className="text-lg">🎓</span>
+            <AppIcon name="level" className="h-5 w-5 text-blue-600" />
             <select
               value={filters.diveLevel || ''}
               onChange={(e) => setFilters({ ...filters, diveLevel: e.target.value })}
@@ -168,7 +169,7 @@ export const SearchPanel = React.forwardRef<HTMLDivElement, SearchPanelProps>(
             aria-label="חפש צלילות"
           >
             <span className="flex items-center justify-center gap-2">
-              <span>🔍</span>
+              <AppIcon name="search" className="h-5 w-5" />
               <span>חפש</span>
             </span>
           </Button>

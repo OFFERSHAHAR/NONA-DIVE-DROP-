@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
+import { AppIcon } from '@/components/AppIcon';
 
 /**
  * UserProfileHeader - Safe area aware header with user info
@@ -288,19 +289,7 @@ export const UserProfileHeader = React.forwardRef<HTMLDivElement, UserProfileHea
               aria-expanded={isMenuOpen}
               className="rounded-lg p-2 text-text-primary transition-colors hover:bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-primary dark:text-text-primary-dark dark:hover:bg-bg-secondary-dark"
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2m0 7a1 1 0 110-2 1 1 0 010 2m0 7a1 1 0 110-2 1 1 0 010 2"
-                />
-              </svg>
+              <AppIcon name="settings" className="h-6 w-6" />
             </button>
 
             <DropdownMenu

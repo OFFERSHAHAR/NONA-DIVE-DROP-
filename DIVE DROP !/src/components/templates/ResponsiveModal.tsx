@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { AppIcon } from '@/components/AppIcon';
 
 /**
  * ResponsiveModal - Modal respecting safe areas
@@ -215,19 +216,7 @@ export const ResponsiveModal = React.forwardRef<HTMLDivElement, ResponsiveModalP
                   aria-label="Close modal"
                   className="rounded-lg p-2 text-text-secondary transition-colors hover:bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-primary dark:text-text-secondary-dark dark:hover:bg-bg-secondary-dark"
                 >
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <AppIcon name="x" className="h-6 w-6" />
                 </button>
               )}
             </header>

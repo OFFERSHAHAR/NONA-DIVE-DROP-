@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+
+  <defs>
+    <linearGradient id="b-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#BFE6F5"></stop><stop offset="1" stop-color="#7FCBEC"></stop>
+    </linearGradient>
+    <linearGradient id="b-sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1C9BE8"></stop><stop offset="1" stop-color="#0E5AA8"></stop>
+    </linearGradient>
+    <linearGradient id="b-pin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12477F"></stop><stop offset="1" stop-color="#0A2647"></stop>
+    </linearGradient>
+    <clipPath id="b-clip"><circle cx="32" cy="29" r="21"></circle></clipPath>
+  </defs>
+  <path d="M32 3C18.7 3 8 13.5 8 26.4 8 41.7 27 58 31 61.2a1.6 1.6 0 0 0 2 0C37 58 56 41.7 56 26.4 56 13.5 45.3 3 32 3z" fill="url(#b-pin)"></path>
+  <g clip-path="url(#b-clip)">
+    <rect x="11" y="8" width="42" height="21.5" fill="url(#b-sky)"></rect>
+    <rect x="11" y="29" width="42" height="24" fill="url(#b-sea)"></rect>
+    
+    <circle cx="43" cy="18" r="5.5" fill="#FFFFFF" opacity="0.85"></circle>
+    
+    <path d="M11 29.5l7-7 5 4 6-6 8 9z" fill="#5BA9D8" opacity="0.6"></path>
+    
+    <path d="M20 28.8h13l-1.6 2.4a1 1 0 0 1-.85.45H22.5a1 1 0 0 1-.86-.5L20 28.8z" fill="#0A2647"></path>
+    <path d="M22 28.4v-3.1l8-1.1 2.6 4.2z" fill="#16517F"></path>
+    <path d="M24 24.9v-1.6h3.4" stroke="#0A2647" stroke-width="0.9" fill="none"></path>
+    
+    <path d="M16 53v-6c0-2 1.4-2.6 1.4-4.4a1.4 1.4 0 1 0-2.8 0c0 1.8 1.4 2.4 1.4 4.4" fill="#7FD3EF" opacity="0.85"></path>
+    <path d="M46 53v-5.4c0-1.6 1.2-2.2 1.2-3.7a1.2 1.2 0 1 0-2.4 0c0 1.5 1.2 2.1 1.2 3.7" fill="#5FC6EA" opacity="0.8"></path>
+    
+    <circle cx="33" cy="40" r="1.4" fill="#CFEEFA" opacity="0.9"></circle>
+    <circle cx="36" cy="36" r="1" fill="#CFEEFA" opacity="0.8"></circle>
+    <circle cx="29" cy="43" r="2.2" fill="#BFE8F8" opacity="0.55"></circle>
+    
+    <path d="M11 30.4h42" stroke="#CFF0FF" stroke-width="0.8" opacity="0.5"></path>
+  </g>
+</svg>

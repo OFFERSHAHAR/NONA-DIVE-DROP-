@@ -1,5 +1,7 @@
 'use client';
 
+import { AppIcon, type AppIconName } from '@/components/AppIcon';
+
 interface ToastProps {
   message: string;
   type?: 'success' | 'error' | 'info' | 'warning';
@@ -14,18 +16,18 @@ export default function Toast({ message, type = 'success' }: ToastProps) {
   }[type];
 
   const icon = {
-    success: '✓',
-    error: '✕',
-    info: 'ℹ',
-    warning: '⚠',
-  }[type];
+    success: 'check',
+    error: 'x',
+    info: 'info',
+    warning: 'fire',
+  }[type] as AppIconName;
 
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 animate-slide-up">
       <div
         className={`${bgColor} text-white px-4 py-3 rounded-md shadow-lg flex items-center gap-3 max-w-sm`}
       >
-        <span className="text-lg font-bold">{icon}</span>
+        <AppIcon name={icon} className="h-5 w-5" />
         <span className="text-sm font-medium">{message}</span>
       </div>
     </div>

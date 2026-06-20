@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import clsx from 'clsx';
-import type { ReactNode } from 'react';
+import { AppIcon, type AppIconName } from '@/components/AppIcon';
 
 interface NavItem {
   id: string;
@@ -18,14 +18,14 @@ export interface BottomNavigationProps {
 }
 
 function NavIcon({ id }: { id: string }) {
-  const paths: Record<string, ReactNode> = {
-    explore: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
-    'my-dives': <><path d="M4 17c3-5 7-8 16-8" /><path d="M7 17h10" /><circle cx="16" cy="7" r="2" /></>,
-    home: <><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></>,
-    dashboard: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>,
-    profile: <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>,
+  const icons: Record<string, AppIconName> = {
+    explore: 'compass',
+    'my-dives': 'diver',
+    home: 'home',
+    dashboard: 'calendar',
+    profile: 'user',
   };
-  return <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[id]}</svg>;
+  return <AppIcon name={icons[id] || 'compass'} className="h-6 w-6" />;
 }
 
 export function BottomNavigation({ items, activeId, className }: BottomNavigationProps) {

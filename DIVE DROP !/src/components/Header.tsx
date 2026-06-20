@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { AppIcon, type AppIconName } from '@/components/AppIcon';
 
 export interface HeaderProps {
   showNotificationBadge?: boolean;
@@ -25,12 +26,12 @@ export const Header: React.FC<HeaderProps> = ({
   const isHome = pathname === `/${locale}`;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigationItems = [
-    { href: `/${locale}`, icon: '🏠', label: isRTL ? 'דף הבית' : 'Home' },
-    { href: `/${locale}/explore`, icon: '🔍', label: isRTL ? 'גילוי אתרי צלילה' : 'Explore' },
-    { href: `/${locale}/my-dives`, icon: '🤿', label: isRTL ? 'הצלילות שלי' : 'My Dives' },
-    { href: `/${locale}/dashboard`, icon: '📊', label: isRTL ? 'לוח בקרה' : 'Dashboard' },
-    { href: `/${locale}/profile`, icon: '👤', label: isRTL ? 'פרופיל' : 'Profile' },
-    { href: `/${locale}/settings`, icon: '⚙️', label: isRTL ? 'הגדרות' : 'Settings' },
+    { href: `/${locale}`, icon: 'home' as AppIconName, label: isRTL ? 'דף הבית' : 'Home' },
+    { href: `/${locale}/explore`, icon: 'search' as AppIconName, label: isRTL ? 'גילוי אתרי צלילה' : 'Explore' },
+    { href: `/${locale}/my-dives`, icon: 'diver' as AppIconName, label: isRTL ? 'הצלילות שלי' : 'My Dives' },
+    { href: `/${locale}/dashboard`, icon: 'chart' as AppIconName, label: isRTL ? 'לוח בקרה' : 'Dashboard' },
+    { href: `/${locale}/profile`, icon: 'user' as AppIconName, label: isRTL ? 'פרופיל' : 'Profile' },
+    { href: `/${locale}/settings`, icon: 'settings' as AppIconName, label: isRTL ? 'הגדרות' : 'Settings' },
   ];
 
   const handleMenuClick = () => {
@@ -45,14 +46,14 @@ export const Header: React.FC<HeaderProps> = ({
         className={clsx(
           'fixed top-0 left-0 right-0 z-50 transition-colors',
           isHome
-            ? 'border-0 bg-transparent text-white shadow-none lg:right-auto lg:w-[68%]'
+            ? 'border-0 bg-transparent text-white shadow-none lg:right-auto lg:w-[calc(100%_-_499px)]'
             : 'border-b border-border-primary bg-white/95 shadow-sm backdrop-blur-sm dark:border-border-dark dark:bg-dark-surface/95',
           className
         )}
       >
         <div
           dir={isHome ? 'ltr' : undefined}
-          className={clsx('h-16 px-4 sm:px-6 flex items-center', isHome ? 'justify-start gap-6 lg:px-8 lg:pt-3' : 'justify-between')}
+          className={clsx('relative flex h-16 items-center px-4 sm:px-6', isHome ? 'justify-between lg:justify-start lg:gap-6 lg:px-8 lg:pt-3' : 'justify-between')}
         >
           {/* Left: Hamburger Menu */}
           <button
@@ -60,38 +61,15 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label={isRTL ? 'תפריט' : 'Menu'}
             className={clsx('rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
           >
-            <svg
-              className={clsx('h-6 w-6', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            <AppIcon name="menu" className={clsx('h-7 w-7', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')} />
           </button>
 
           {/* Center/Right: Logo & Branding */}
           <Link
             href={`/${locale}`}
-            className={clsx('flex-1 items-center justify-center gap-2 sm:gap-3 group', isHome ? 'hidden' : 'flex')}
+            className={clsx('items-center justify-center group', isHome ? 'absolute left-1/2 flex -translate-x-1/2 lg:hidden' : 'flex flex-1')}
           >
-            {/* Logo Icon */}
-            <div className="flex h-11 w-9 items-center justify-center rounded-[45%_45%_55%_55%] bg-gradient-to-b from-cyan-400 to-blue-800 text-xl text-white shadow-md">🌊</div>
-
-            {/* Brand Text */}
-            <div className={`hidden sm:flex flex-col gap-0 ${isRTL ? 'text-right' : 'text-left'}`}>
-              <div className="text-lg font-extrabold tracking-tight text-primary dark:text-cyan-accent">
-                {isRTL ? 'DiveDrop' : 'DiveDrop'}
-              </div>
-              <div className="text-xs text-text-secondary dark:text-text-secondary-light leading-tight">
-                {isRTL ? 'DIVE MORE. CARE MORE.' : 'DIVE MORE. CARE MORE.'}
-              </div>
-            </div>
+            <img src={isHome ? '/assets/logo/divedrop-logo-white.svg' : '/assets/logo/divedrop-logo-full.svg'} alt="DiveDrop" className={isHome ? 'h-11 w-auto' : 'h-12 w-auto'} />
           </Link>
 
           {/* Right: Notification Bell */}
@@ -99,19 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label={isRTL ? 'התראות' : 'Notifications'}
             className={clsx('relative rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
           >
-            <svg
-              className={clsx('h-6 w-6', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
+            <AppIcon name="bell" className={clsx('h-7 w-7', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')} />
 
             {/* Notification Badge */}
             {showNotificationBadge && notificationCount > 0 && (
@@ -144,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="mb-6 flex items-center justify-between border-b border-border-primary pb-4 dark:border-border-dark">
               <div>
-                <div className="text-xl font-bold text-primary">DiveDrop</div>
+                <img src="/assets/logo/divedrop-logo-full.svg" alt="DiveDrop" className="h-12 w-auto" />
                 <div className="text-sm text-text-secondary">
                   {isRTL ? 'ניווט באתר' : 'Site navigation'}
                 </div>
@@ -152,10 +118,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(false)}
-                className="rounded-lg p-2 text-2xl hover:bg-bg-secondary"
+                className="rounded-lg p-2 hover:bg-bg-secondary"
                 aria-label={isRTL ? 'סגירה' : 'Close'}
               >
-                ×
+                <AppIcon name="x" className="h-6 w-6" />
               </button>
             </div>
             <nav className="border-0 bg-transparent">
@@ -167,7 +133,7 @@ export const Header: React.FC<HeaderProps> = ({
                       onClick={() => setIsMenuOpen(false)}
                       className="flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 font-semibold text-text-primary transition-colors hover:bg-primary/10 hover:text-primary dark:text-text-light"
                     >
-                      <span aria-hidden="true">{item.icon}</span>
+                      <AppIcon name={item.icon} className="h-5 w-5" />
                       <span>{item.label}</span>
                     </Link>
                   </li>
