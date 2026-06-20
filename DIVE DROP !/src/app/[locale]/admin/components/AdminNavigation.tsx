@@ -39,6 +39,42 @@ export default function AdminNavigation() {
       href: '/admin/shuttles',
       icon: '🚐',
     },
+    // Equipment Rental Section
+    {
+      label: 'Equipment Rental',
+      href: '/admin/equipment',
+      icon: '🎽',
+    },
+    {
+      label: 'Damage Reports',
+      href: '/admin/damage-reports',
+      icon: '⚠️',
+    },
+    {
+      label: 'Problematic Users',
+      href: '/admin/problematic-users',
+      icon: '🚫',
+    },
+    {
+      label: 'Commissions',
+      href: '/admin/commissions',
+      icon: '💰',
+    },
+    {
+      label: 'Missing Equipment',
+      href: '/admin/missing-equipment',
+      icon: '❌',
+    },
+    {
+      label: 'Disputes',
+      href: '/admin/disputes',
+      icon: '⚔️',
+    },
+    {
+      label: 'Analytics',
+      href: '/admin/equipment-analytics',
+      icon: '📈',
+    },
     {
       label: t('nav.settings'),
       href: '/admin/settings',
