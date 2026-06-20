@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import '../globals.css';
@@ -33,7 +34,9 @@ export default async function LocaleLayout({
         <meta name="description" content={isRtl ? 'DiveDrop - הדרך החכמה שלך לצלילה בטוחה, אחראית ומקצועית.' : 'DiveDrop - Your smart way to safe, responsible, and professional diving.'} />
       </head>
       <body className="bg-light-bg dark:bg-dark-bg text-text-primary dark:text-text-light">
-        {children}
+        <NextIntlClientProvider locale={locale}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );
