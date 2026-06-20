@@ -1,281 +1,66 @@
 'use client';
 
-import React from 'react';
-import clsx from 'clsx';
 import Link from 'next/link';
-
-/**
- * BottomNavigation - Mobile-first bottom navigation
- *
- * Features:
- * - Safe area bottom padding (pb-safe-bottom)
- * - 44px+ touch targets for mobile accessibility
- * - Active state styling with smooth transitions
- * - 4-5 nav items support (responsive)
- * - Dark mode support
- * - Keyboard navigation support
- * - Accessibility: semantic nav, ARIA labels, active states
- * - Responsive: hidden on desktop via breakpoint
- */
+import clsx from 'clsx';
+import type { ReactNode } from 'react';
 
 interface NavItem {
   id: string;
   label: string;
-  icon: React.ReactNode;
   href: string;
-  badge?: number | string;
-  ariaLabel?: string;
+  ariaLabel: string;
 }
 
 export interface BottomNavigationProps {
   items: NavItem[];
   activeId?: string;
-  onNavigate?: (itemId: string) => void;
-  safeAreaInsets?: {
-    bottom: number;
-  };
-  showLabels?: boolean;
   className?: string;
 }
 
-/**
- * BadgeIcon - Display notification badge
- */
-const BadgeIcon = ({
-  children,
-  badge,
-}: {
-  children: React.ReactNode;
-  badge?: number | string;
-}) => {
-  if (!badge) return <>{children}</>;
+function NavIcon({ id }: { id: string }) {
+  const paths: Record<string, ReactNode> = {
+    explore: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
+    'my-dives': <><path d="M4 17c3-5 7-8 16-8" /><path d="M7 17h10" /><circle cx="16" cy="7" r="2" /></>,
+    home: <><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></>,
+    dashboard: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>,
+    profile: <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>,
+  };
+  return <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[id]}</svg>;
+}
 
+export function BottomNavigation({ items, activeId, className }: BottomNavigationProps) {
   return (
-    <div className="relative inline-flex">
-      {children}
-      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-error text-xs font-bold text-white">
-        {typeof badge === 'number' && badge > 99 ? '99+' : badge}
-      </span>
-    </div>
-  );
-};
-
-/**
- * BottomNavItem - Individual navigation item
- */
-const BottomNavItem = React.forwardRef<
-  HTMLAnchorElement,
-  {
-    item: NavItem;
-    isActive: boolean;
-    onNavigate?: () => void;
-    showLabel: boolean;
-  }
->(({ item, isActive, onNavigate, showLabel }, ref) => {
-  return (
-    <Link
-      ref={ref}
-      href={item.href}
-      onClick={onNavigate}
-      aria-current={isActive ? 'page' : undefined}
-      aria-label={item.ariaLabel || item.label}
-      className={clsx(
-        'flex flex-1 flex-col items-center justify-center gap-1.5 px-2 py-2 transition-all duration-200',
-        'min-h-[44px] sm:min-h-[48px]', // Minimum touch target
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:focus-visible:ring-offset-dark',
-        isActive
-          ? 'text-primary dark:text-primary'
-          : 'text-text-secondary hover:text-text-primary dark:text-text-secondary-dark dark:hover:text-text-primary-dark'
-      )}
-    >
-      <BadgeIcon badge={item.badge}>
-        <svg
-          className={clsx(
-            'h-6 w-6 transition-all duration-200 sm:h-7 sm:w-7',
-            isActive ? 'scale-110' : 'scale-100'
-          )}
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          {/* This will be replaced by item.icon */}
-        </svg>
-      </BadgeIcon>
-
-      {showLabel && (
-        <span
-          className={clsx(
-            'text-xs font-semibold transition-colors duration-200 sm:text-sm',
-            isActive
-              ? 'text-primary dark:text-primary'
-              : 'text-text-secondary dark:text-text-secondary-dark'
-          )}
-        >
-          {item.label}
-        </span>
-      )}
-
-      {/* Active indicator line */}
-      {isActive && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary transition-all duration-200" />
-      )}
-    </Link>
-  );
-});
-
-BottomNavItem.displayName = 'BottomNavItem';
-
-/**
- * BottomNavigation component
- */
-export const BottomNavigation = React.forwardRef<HTMLElement, BottomNavigationProps>(
-  (
-    {
-      items,
-      activeId,
-      onNavigate,
-      safeAreaInsets = { bottom: 0 },
-      showLabels = true,
-      className,
-    },
-    ref
-  ) => {
-    // Responsive: Show all labels on mobile, hide on larger screens if items > 4
-    const responsiveShowLabels = showLabels || items.length <= 4;
-
-    return (
-      <>
-        {/* Fixed bottom nav container */}
-        <nav
-          ref={ref}
-          role="navigation"
-          aria-label="Main navigation"
-          className={clsx(
-            'fixed bottom-0 left-0 right-0 z-40 border-t border-border-primary bg-white/95 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-border-secondary dark:bg-dark-surface/95',
-            'md:hidden', // Hide on tablet/desktop
-            className
-          )}
-          style={{
-            paddingBottom: `calc(${safeAreaInsets.bottom}px + env(safe-area-inset-bottom))`,
-          }}
-        >
-          <ul className="flex h-[68px] items-stretch sm:h-[72px]">
-            {items.map((item) => (
-              <li key={item.id} className="relative flex-1">
-                <Link
-                  href={item.href}
-                  onClick={() => onNavigate?.(item.id)}
-                  aria-current={activeId === item.id ? 'page' : undefined}
-                  aria-label={item.ariaLabel || item.label}
-                  className={clsx(
-                    'relative flex flex-1 flex-col items-center justify-center gap-1.5 px-2 transition-all duration-200',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset',
-                    activeId === item.id
-                      ? 'text-primary dark:text-primary'
-                      : 'text-text-secondary hover:text-text-primary dark:text-text-secondary-dark dark:hover:text-text-primary-dark'
-                  )}
-                >
-                  {/* Icon */}
-                  <BadgeIcon badge={item.badge}>
-                    <div
-                      className={clsx(
-                        'transition-all duration-200',
-                        activeId === item.id ? 'scale-110' : 'scale-100'
-                      )}
-                    >
-                      {item.icon}
-                    </div>
-                  </BadgeIcon>
-
-                  {/* Label - show on mobile, responsive on larger screens */}
-                  {responsiveShowLabels && (
-                    <span className="max-w-full truncate whitespace-nowrap text-[10px] font-semibold transition-colors duration-200 sm:text-xs">
-                      {item.label}
-                    </span>
-                  )}
-
-                  {/* Active indicator bar */}
-                  {activeId === item.id && (
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary transition-all duration-200" />
-                  )}
+    <>
+      <nav aria-label="Main navigation" className={clsx('fixed bottom-0 left-0 right-0 z-40 border-t border-blue-100 bg-white/95 px-2 shadow-[0_-8px_30px_rgba(15,55,95,.10)] backdrop-blur-xl md:px-8', className)}>
+        <ul className="mx-auto flex h-[72px] max-w-5xl items-center justify-around pb-[env(safe-area-inset-bottom)]">
+          {items.map(item => {
+            const active = activeId === item.id;
+            const home = item.id === 'home';
+            return (
+              <li key={item.id} className="flex flex-1 justify-center">
+                <Link href={item.href} aria-label={item.ariaLabel} aria-current={active ? 'page' : undefined} className={clsx('relative flex min-w-14 flex-col items-center justify-center gap-1 text-[11px] font-semibold transition', home && active ? '-mt-8 h-16 w-16 rounded-full bg-gradient-to-b from-cyan-400 to-blue-700 text-white shadow-[0_8px_20px_rgba(0,105,210,.35)]' : active ? 'text-blue-700' : 'text-[#142b4d] hover:text-blue-600')}>
+                  <NavIcon id={item.id} />
+                  {!(home && active) && <span className="whitespace-nowrap">{item.label}</span>}
                 </Link>
               </li>
-            ))}
-          </ul>
-        </nav>
+            );
+          })}
+        </ul>
+      </nav>
+      <div className="h-[72px]" />
+    </>
+  );
+}
 
-        {/* Bottom spacing placeholder for fixed nav */}
-        <div className="h-[68px] sm:h-[72px] md:hidden" />
-      </>
-    );
-  }
-);
-
-BottomNavigation.displayName = 'BottomNavigation';
-
-/**
- * Preset navigation configurations
- */
 export const BottomNavigationPresets = {
-  diveDropMain: (activeId?: string, locale: string = 'en'): NavItem[] => {
-    const isRTL = locale === 'he';
+  diveDropMain: (_activeId?: string, locale = 'en'): NavItem[] => {
+    const he = locale === 'he';
     return [
-      {
-        id: 'explore',
-        label: isRTL ? '🔍' : '🔍',
-        href: `/${locale}/explore`,
-        ariaLabel: isRTL ? 'גלה אתרי צלילה' : 'Explore dive sites',
-        icon: (
-          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth={2} stroke="currentColor" fill="none" />
-          </svg>
-        ),
-      },
-      {
-        id: 'my-dives',
-        label: isRTL ? '🤿' : '🤿',
-        href: `/${locale}/my-dives`,
-        ariaLabel: isRTL ? 'הצלילות שלי' : 'My dives',
-        badge: 0,
-        icon: (
-          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
-          </svg>
-        ),
-      },
-      {
-        id: 'home',
-        label: isRTL ? '🏠' : '🏠',
-        href: `/${locale}`,
-        ariaLabel: isRTL ? 'דף הבית' : 'Home',
-        icon: (
-          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-          </svg>
-        ),
-      },
-      {
-        id: 'dashboard',
-        label: isRTL ? '📊' : '📊',
-        href: `/${locale}/dashboard`,
-        ariaLabel: isRTL ? 'לוח בקרה' : 'Dashboard',
-        icon: (
-          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.08-2.51c-.29-.35-.77-.35-1.06 0-.29.35-.29.93 0 1.28l2.61 3.13c.29.35.77.35 1.06 0l3.28-4.21c.29-.35.29-.93 0-1.28-.29-.36-.77-.36-1.06-.01z" />
-          </svg>
-        ),
-      },
-      {
-        id: 'profile',
-        label: isRTL ? '👤' : '👤',
-        href: `/${locale}/profile`,
-        ariaLabel: isRTL ? 'הפרופיל שלי' : 'My profile',
-        icon: (
-          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-          </svg>
-        ),
-      },
+      { id: 'explore', label: he ? 'גילוי' : 'Explore', href: `/${locale}/explore`, ariaLabel: he ? 'גלה אתרי צלילה' : 'Explore dive sites' },
+      { id: 'my-dives', label: he ? 'הצלילות' : 'My dives', href: `/${locale}/my-dives`, ariaLabel: he ? 'הצלילות שלי' : 'My dives' },
+      { id: 'home', label: he ? 'בית' : 'Home', href: `/${locale}`, ariaLabel: he ? 'דף הבית' : 'Home' },
+      { id: 'dashboard', label: he ? 'הזמנות' : 'Bookings', href: `/${locale}/dashboard`, ariaLabel: he ? 'לוח בקרה והזמנות' : 'Dashboard and bookings' },
+      { id: 'profile', label: he ? 'פרופיל' : 'Profile', href: `/${locale}/profile`, ariaLabel: he ? 'הפרופיל שלי' : 'My profile' },
     ];
   },
 };

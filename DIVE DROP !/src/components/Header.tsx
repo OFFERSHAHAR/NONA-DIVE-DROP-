@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
 export interface HeaderProps {
@@ -19,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   className,
 }) => {
   const locale = useLocale();
+  const pathname = usePathname();
   const isRTL = locale === 'he';
+  const isHome = pathname === `/${locale}`;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigationItems = [
     { href: `/${locale}`, icon: '🏠', label: isRTL ? 'דף הבית' : 'Home' },
@@ -40,19 +43,25 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Fixed Header */}
       <header
         className={clsx(
-          'fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border-primary dark:bg-dark-surface/95 dark:border-border-dark shadow-sm',
+          'fixed top-0 left-0 right-0 z-50 transition-colors',
+          isHome
+            ? 'border-0 bg-transparent text-white shadow-none lg:right-auto lg:w-[68%]'
+            : 'border-b border-border-primary bg-white/95 shadow-sm backdrop-blur-sm dark:border-border-dark dark:bg-dark-surface/95',
           className
         )}
       >
-        <div className="h-16 px-4 sm:px-6 flex items-center justify-between">
+        <div
+          dir={isHome ? 'ltr' : undefined}
+          className={clsx('h-16 px-4 sm:px-6 flex items-center', isHome ? 'justify-start gap-6 lg:px-8 lg:pt-3' : 'justify-between')}
+        >
           {/* Left: Hamburger Menu */}
           <button
             onClick={handleMenuClick}
             aria-label={isRTL ? 'תפריט' : 'Menu'}
-            className="p-2 hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated rounded-lg transition-colors"
+            className={clsx('rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
           >
             <svg
-              className="w-6 h-6 text-text-primary dark:text-text-light"
+              className={clsx('h-6 w-6', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -69,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Center/Right: Logo & Branding */}
           <Link
             href={`/${locale}`}
-            className="flex-1 flex items-center justify-center gap-2 sm:gap-3 group"
+            className={clsx('flex-1 items-center justify-center gap-2 sm:gap-3 group', isHome ? 'hidden' : 'flex')}
           >
             {/* Logo Icon */}
             <div className="flex h-11 w-9 items-center justify-center rounded-[45%_45%_55%_55%] bg-gradient-to-b from-cyan-400 to-blue-800 text-xl text-white shadow-md">🌊</div>
@@ -88,10 +97,10 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Right: Notification Bell */}
           <button
             aria-label={isRTL ? 'התראות' : 'Notifications'}
-            className="relative p-2 hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated rounded-lg transition-colors"
+            className={clsx('relative rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
           >
             <svg
-              className="w-6 h-6 text-text-primary dark:text-text-light"
+              className={clsx('h-6 w-6', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -115,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
       </header>
 
       {/* Header Spacing Placeholder */}
-      <div className="h-16" />
+      <div className={isHome ? 'h-0' : 'h-16'} />
 
       {/* Navigation drawer */}
       {isMenuOpen && (
