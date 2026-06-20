@@ -2,6 +2,8 @@ import { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { AppNavigation } from '@/components/AppNavigation';
+import { Header } from '@/components/Header';
 import '../globals.css';
 import '../../styles/design-system.css';
 
@@ -35,7 +37,9 @@ export default async function LocaleLayout({
       </head>
       <body className="bg-light-bg dark:bg-dark-bg text-text-primary dark:text-text-light">
         <NextIntlClientProvider locale={locale}>
-          {children}
+          <Header />
+          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
+          <AppNavigation />
         </NextIntlClientProvider>
       </body>
     </html>

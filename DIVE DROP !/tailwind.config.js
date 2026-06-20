@@ -236,44 +236,7 @@ export default {
     },
   },
 
-  plugins: [
-    // Plugin for custom utilities
-    function ({ addUtilities }) {
-      const newUtilities = {
-        ".glass": {
-          "backdrop-filter": "blur(12px)",
-          "background": "rgba(10, 20, 40, 0.8)",
-          "border": "1px solid rgba(255, 255, 255, 0.1)",
-        },
-        ".glass-modal": {
-          "backdrop-filter": "blur(8px)",
-          "background": "rgba(0, 0, 0, 0.6)",
-        },
-        ".touch-target": {
-          "@apply min-h-touch min-w-touch": {},
-        },
-        ".btn-primary": {
-          "@apply px-6 py-3 bg-ocean-blue text-white rounded-md font-semibold transition-all duration-200 hover:bg-ocean-blue-dark active:scale-95 focus:outline-cyan-accent focus:outline-offset-2": {},
-        },
-        ".btn-secondary": {
-          "@apply px-6 py-3 bg-light-surface text-ocean-blue border border-border-light rounded-md font-semibold transition-all duration-200 hover:bg-gray-50 dark:bg-dark-surface dark:text-cyan-accent dark:border-border-dark": {},
-        },
-        ".btn-ghost": {
-          "@apply px-6 py-3 text-ocean-blue font-semibold rounded-md transition-all duration-200 hover:bg-blue-50 dark:hover:bg-opacity-10": {},
-        },
-        ".input-base": {
-          "@apply px-4 py-3 h-touch bg-light-surface text-text-dark border border-border-light rounded-md font-body transition-all duration-200 focus:border-ocean-blue focus:ring-2 focus:ring-blue-200 dark:bg-dark-surface dark:text-text-light dark:border-border-dark dark:focus:ring-blue-900": {},
-        },
-        ".card": {
-          "@apply p-4 md:p-6 bg-light-surface rounded-lg shadow-elevation-2 border border-border-light transition-all duration-200 hover:shadow-elevation-3 dark:bg-dark-surface dark:border-border-dark": {},
-        },
-        ".container-safe": {
-          "@apply w-full max-w-4xl mx-auto px-4 pt-safe-top pb-safe-bottom": {},
-        },
-      };
-      addUtilities(newUtilities);
-    },
-  ],
+  plugins: [],
 
   // Dark mode toggle strategy
   darkMode: "class",
