@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { aggregatedConditionsSchema } from '@/lib/feedback/validation';
+import { withRateLimit } from '@/lib/security/rate-limiter';
 import type { AggregatedConditions } from '@/types/feedback';
 
 export const dynamic = 'force-dynamic';
@@ -8,6 +9,13 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/feedback/aggregate?siteId=<uuid>
  * Get aggregated dive conditions for a specific dive site
+ *
+ * Rate limiting:
+ * - 60 requests per minute (public read endpoint)
+ *
+ * Caching:
+ * - Response is cached for 5 minutes (browser cache control)
+ * - Server-side cache: Aggregated data recalculated every 5 minutes
  *
  * Query parameters:
  * - siteId (required): UUID of the dive site
@@ -32,9 +40,15 @@ export const dynamic = 'force-dynamic';
  *     error: string,
  *     total_feedback_count: number
  *   }
+ * - 429: Rate limit exceeded (60 per minute)
  * - 500: Server error
  */
 export async function GET(request: NextRequest) {
+  // Rate limiting: Check if client has exceeded 60 requests per minute
+  const rateLimitResult = await withRateLimit(request);
+  if (rateLimitResult) {
+    return rateLimitResult;
+  }
   try {
     // Extract siteId query parameter
     const { searchParams } = new URL(request.url);
@@ -82,7 +96,13 @@ export async function GET(request: NextRequest) {
           cached_at: cachedData.cached_at,
         };
 
-        return NextResponse.json(response);
+        // Cache headers: Client-side caching for 5 minutes
+        return NextResponse.json(response, {
+          headers: {
+            'Cache-Control': 'public, max-age=300', // 5 minutes = 300 seconds
+            'ETag': `"${Buffer.from(JSON.stringify(response)).toString('base64').substring(0, 16)}"`,
+          },
+        });
       }
     }
 
@@ -200,8 +220,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Return aggregated conditions
-    return NextResponse.json(validationResult.data);
+    // Return aggregated conditions with cache headers
+    return NextResponse.json(validationResult.data, {
+      headers: {
+        'Cache-Control': 'public, max-age=300', // 5 minutes = 300 seconds
+        'ETag': `"${Buffer.from(JSON.stringify(validationResult.data)).toString('base64').substring(0, 16)}"`,
+      },
+    });
   } catch (error) {
     console.error('Aggregate endpoint error:', error);
     return NextResponse.json(

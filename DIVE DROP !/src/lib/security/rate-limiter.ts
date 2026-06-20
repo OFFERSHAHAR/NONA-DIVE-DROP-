@@ -92,6 +92,19 @@ export const RATE_LIMIT_CONFIGS: Record<string, RateLimitConfig> = {
     maxRequests: 100,
     windowSeconds: 60,
   },
+
+  // Feedback endpoints
+  'POST /api/feedback': {
+    maxRequests: 5, // 5 feedback submissions
+    windowSeconds: 3600, // per hour per user
+    message: 'Too many feedback submissions. Maximum 5 per hour per user.',
+  },
+
+  'GET /api/feedback/aggregate': {
+    maxRequests: 60, // 60 requests per minute is generous for public reads
+    windowSeconds: 60,
+    message: 'Too many requests. Please try again later.',
+  },
 };
 
 /**
