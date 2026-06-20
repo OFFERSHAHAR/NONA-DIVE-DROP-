@@ -1,9 +1,0 @@
-{
-  "baseFontSize": 16,
-  "textFontFamily": "Segoe UI, system-ui, sans-serif",
-  "cssTheme": "Obsidian Nord",
-  "theme": "obsidian",
-  "accentColor": "#7c3aed",
-  "translucency": true,
-  "nativeMenus": true
-}

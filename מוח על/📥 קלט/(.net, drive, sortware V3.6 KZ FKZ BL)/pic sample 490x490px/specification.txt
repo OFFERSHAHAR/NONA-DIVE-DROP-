@@ -1,6 +1,0 @@
-Hardware area: 38x38mm
-
-
-
-Image area: 490x490px jpg suit for DK-8-KZ ,  DK-8 PRO-5 ,  JZ-5 ,JZ-6, DK-5 PRO-5
-490 x 0.075(stepping distance) = 36.75mm
