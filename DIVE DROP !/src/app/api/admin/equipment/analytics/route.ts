@@ -43,19 +43,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Add admin role check
-    // const { data: adminRole } = await supabase
-    //   .from('admin_roles')
-    //   .select('role')
-    //   .eq('user_id', user.id)
-    //   .single();
-    //
-    // if (!adminRole) {
-    //   return NextResponse.json(
-    //     { error: 'Unauthorized: Admin access required' },
-    //     { status: 403 }
-    //   );
-    // }
+    // CRITICAL SECURITY: Verify admin access against admin_users table (not user_metadata which can be spoofed)
+    // @ts-ignore - admin_users table exists but not in generated types
+    const { data: adminUser } = await supabase
+      .from('admin_users')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!adminUser) {
+      return NextResponse.json(
+        { error: 'Forbidden: Admin access required' },
+        { status: 403 }
+      );
+    }
 
     const urlParams = new URL(request.url).searchParams;
     const period = urlParams.get('period') || 'month'; // 'week', 'month', 'year'
@@ -175,7 +176,7 @@ export async function GET(request: NextRequest) {
             ? ((rentals.reduce((sum, r) => sum + r.commission_rate, 0) / rentals.length) * 100).toFixed(1)
             : 0,
         },
-        top_equipment: (topEquipment || []).map((eq) => ({
+        top_equipment: (topEquipment || []).map((eq: any) => ({
           id: eq.id,
           name: eq.equipment?.name,
           category: eq.equipment?.category,
