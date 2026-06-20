@@ -106,3 +106,10 @@ export async function getCurrentUser() {
     return null;
   }
 }
+
+
+// Alias for API routes that use getAuth
+export async function getAuth() {
+  const user = await getCurrentUser();
+  return { user };
+}

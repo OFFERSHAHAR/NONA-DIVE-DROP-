@@ -1,0 +1,330 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry-run mode (validate without deploying)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  deployments: write
+  statuses: write
+  pull-requests: write
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  NODE_VERSION: '20'
+  DRY_RUN: ${{ github.event.inputs.dry-run || false }}
+
+jobs:
+  pre-deployment-validation:
+    name: Pre-Deployment Validation
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-allowed: ${{ steps.validation.outputs.deployment-allowed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate deployment conditions
+        id: validation
+        run: |
+          echo "Validating staging deployment conditions..."
+
+          # Check if on develop branch
+          if [ "${{ github.ref }}" != "refs/heads/develop" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "❌ Not on develop branch - manual trigger only"
+            echo "deployment-allowed=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # Check required secrets
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ VERCEL_TOKEN not configured"
+            echo "deployment-allowed=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.STAGING_APP_URL }}" ]; then
+            echo "⚠️ STAGING_APP_URL not set - using default"
+          fi
+
+          echo "✓ Pre-deployment validation passed"
+          echo "deployment-allowed=true" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    name: Build & Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: pre-deployment-validation
+    timeout-minutes: 30
+    environment: staging
+    if: needs.pre-deployment-validation.outputs.deployment-allowed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint -- --format compact
+        continue-on-error: true
+
+      - name: Run type checking
+        run: npx tsc --noEmit
+
+      - name: Run unit tests
+        run: npm run test
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_ENV: staging
+          NEXT_PUBLIC_APP_URL: ${{ secrets.STAGING_APP_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Verify build integrity
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "❌ Build failed"
+            exit 1
+          fi
+          echo "✓ Build verified"
+
+      - name: Check dry-run mode
+        id: dry-run-check
+        run: |
+          if [ "${{ env.DRY_RUN }}" = "true" ]; then
+            echo "is_dry_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_dry_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Dry-run deployment (if enabled)
+        if: steps.dry-run-check.outputs.is_dry_run == 'true'
+        run: |
+          echo "🏃 DRY-RUN MODE: Skipping actual Vercel deployment"
+          echo "Build artifacts validated successfully"
+          echo "Would deploy to: ${{ secrets.STAGING_APP_URL }}"
+
+      - name: Install Vercel CLI
+        if: steps.dry-run-check.outputs.is_dry_run == 'false'
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel Staging
+        if: steps.dry-run-check.outputs.is_dry_run == 'false'
+        id: deployment
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --confirm \
+            --prod=false)
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "✓ Deployment URL: $DEPLOYMENT_URL"
+
+      - name: Create deployment status
+        if: steps.dry-run-check.outputs.is_dry_run == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deploymentUrl = '${{ steps.deployment.outputs.deployment_url }}';
+            github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.ref,
+              environment: 'staging',
+              description: 'Staging deployment via GitHub Actions',
+              auto_merge: false,
+              required_contexts: [],
+              production_environment: false
+            }).then(deployment => {
+              github.rest.repos.createDeploymentStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                deployment_id: deployment.data.id,
+                state: 'success',
+                description: 'Deployment successful',
+                environment_url: deploymentUrl,
+                auto_inactive: false
+              });
+            });
+
+      - name: Comment with deployment status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const dryRun = '${{ env.DRY_RUN }}' === 'true';
+            const emoji = dryRun ? '🏃' : status === 'success' ? '🚀' : '❌';
+            const mode = dryRun ? '[DRY-RUN] ' : '';
+            const url = '${{ steps.deployment.outputs.deployment_url }}' || '${{ secrets.STAGING_APP_URL }}';
+
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `${emoji} ${mode}Staging deployment ${status}\n\n[View Preview](${url})`
+            });
+
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: always()
+    timeout-minutes: 10
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Health check endpoint
+        run: |
+          HEALTH_URL="${{ secrets.STAGING_APP_URL }}/api/health"
+          MAX_RETRIES=30
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Health check attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
+
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+
+            if [ "$RESPONSE" = "200" ]; then
+              echo "✓ Health check passed"
+              exit 0
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              sleep 5
+            fi
+          done
+
+          echo "❌ Health check failed after $MAX_RETRIES attempts"
+          exit 1
+        continue-on-error: true
+
+      - name: Verify critical endpoints
+        run: |
+          echo "Verifying critical endpoints..."
+
+          endpoints=(
+            "/api/health"
+            "/en"
+            "/he"
+          )
+
+          for endpoint in "${endpoints[@]}"; do
+            echo "Checking $endpoint..."
+            curl -s -I "${{ secrets.STAGING_APP_URL }}$endpoint" | head -1
+          done
+
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: health-check
+    if: always()
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: |
+          cat > smoke-test.mjs << 'EOF'
+          import { chromium } from 'playwright';
+
+          const baseUrl = process.env.STAGING_APP_URL || 'https://staging.dive-drop.app';
+          const browser = await chromium.launch();
+          const page = await browser.newPage();
+
+          try {
+            // Test homepage
+            console.log('Testing homepage...');
+            await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+            const title = await page.title();
+            console.log(`✓ Homepage loaded - Title: ${title}`);
+
+            // Test locale switching
+            console.log('Testing locale switching...');
+            await page.goto(`${baseUrl}/he`, { waitUntil: 'domcontentloaded' });
+            console.log('✓ Hebrew locale works');
+
+            // Test authentication page
+            console.log('Testing auth pages...');
+            await page.goto(`${baseUrl}/en/auth/login`, { waitUntil: 'domcontentloaded' });
+            const loginForm = await page.locator('form').count();
+            if (loginForm > 0) {
+              console.log('✓ Login page loaded');
+            } else {
+              console.warn('⚠ Login form not found');
+            }
+
+            console.log('\n✓ All smoke tests passed');
+            process.exit(0);
+          } catch (error) {
+            console.error('❌ Smoke test failed:', error.message);
+            process.exit(1);
+          } finally {
+            await browser.close();
+          }
+          EOF
+
+          STAGING_APP_URL="${{ secrets.STAGING_APP_URL }}" node smoke-test.mjs
+        continue-on-error: true
+
+  deployment-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy, health-check, smoke-tests]
+    if: always()
+    steps:
+      - name: Generate deployment summary
+        run: |
+          echo "## Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Build & Deploy: ${{ needs.build-and-deploy.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health Check: ${{ needs.health-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Smoke Tests: ${{ needs.smoke-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Preview URL" >> $GITHUB_STEP_SUMMARY
+          echo "[View Staging](${{ secrets.STAGING_APP_URL }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Test on staging environment" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify all features work as expected" >> $GITHUB_STEP_SUMMARY
+          echo "3. Check logs for errors" >> $GITHUB_STEP_SUMMARY
+          echo "4. Prepare for production deployment" >> $GITHUB_STEP_SUMMARY

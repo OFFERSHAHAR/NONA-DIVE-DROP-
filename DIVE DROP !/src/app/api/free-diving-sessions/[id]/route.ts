@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic';
 // GET /api/free-diving-sessions/[id] - Get session details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    const { id } = params;
+    const { id } = await params;
 
     // Get session details
     const { data: session, error: sessionError } = await supabase
@@ -58,11 +58,11 @@ export async function GET(
 // PATCH /api/free-diving-sessions/[id] - Update session
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    const { id } = params;
+    const { id } = await params;
 
     // Get user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -120,11 +120,11 @@ export async function PATCH(
 // DELETE /api/free-diving-sessions/[id] - Delete session
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
-    const { id } = params;
+    const { id } = await params;
 
     // Get user
     const { data: { user }, error: authError } = await supabase.auth.getUser();

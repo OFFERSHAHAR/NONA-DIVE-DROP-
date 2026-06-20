@@ -163,3 +163,69 @@ export const problematicUserFilterSchema = z.object({
 });
 
 export type ProblematicUserFilter = z.infer<typeof problematicUserFilterSchema>;
+
+// ============================================================================
+// STUB SCHEMAS FOR INCOMPLETE API ROUTES
+// ============================================================================
+// These schemas are imported by in-progress API routes but not yet fully implemented.
+
+export const createEquipmentListingSchema = equipmentCreateSchema;
+export type CreateEquipmentListing = EquipmentCreate;
+
+export const searchEquipmentListingsSchema = equipmentFilterSchema.extend({
+  location_lat: z.number().optional(),
+  location_lng: z.number().optional(),
+  max_distance_km: z.number().default(50),
+  price_min: z.number().optional(),
+  price_max: z.number().optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  sort_by: z.string().default('newest'),
+});
+
+export const myEquipmentListingsSchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  status: z.string().optional(),
+  sort_by: z.string().optional(),
+});
+
+export const myRentalsSchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  status: z.string().optional(),
+  sort_by: z.string().optional(),
+});
+
+export const requestEquipmentRentalSchema = z.object({
+  equipment_id: z.string().uuid(),
+  start_date: z.string().datetime(),
+  end_date: z.string().datetime(),
+  notes: z.string().optional(),
+});
+
+export const validateRentalDates = (startDate: string, endDate: string) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  return start < end && start > new Date();
+};
+
+export const approveEquipmentRentalSchema = z.object({
+  rental_id: z.string().uuid(),
+  rental_start_date: z.string().datetime(),
+  rental_end_date: z.string().datetime(),
+});
+
+export const returnEquipmentSchema = z.object({
+  rental_id: z.string().uuid(),
+  condition: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export const createEquipmentReviewSchema = z.object({
+  equipment_id: z.string().uuid(),
+  rental_id: z.string().uuid().optional(),
+  rating: z.number().int().min(1).max(5),
+  title: z.string().min(5),
+  comment: z.string().min(10),
+});

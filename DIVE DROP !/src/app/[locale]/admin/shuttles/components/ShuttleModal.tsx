@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import { createShuttle, updateShuttle } from '../../actions/adminActions';
 import { createShuttleSchema, updateShuttleSchema } from '@/lib/validation/adminValidation';
 import { Shuttle, DayOfWeek } from '@/lib/types/admin';

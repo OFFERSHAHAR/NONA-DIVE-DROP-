@@ -3,8 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAdminStore } from '@/lib/stores/adminStore';
-import { loginAdmin } from '../actions/adminActions';
+import { useAdminStore } from '@/stores';
 import { Loader } from '../layout';
 
 export default function AdminLogin() {
@@ -12,7 +11,7 @@ export default function AdminLogin() {
   const router = useRouter();
   const { setUser, setAuthenticated, setError: setStoreError } = useAdminStore();
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +22,18 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const result = await loginAdmin({ email, password });
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const result = await response.json();
 
       if (!result.success) {
-        setError(result.error || t('login.error.invalid_credentials'));
+        setError(result.error || 'Invalid credentials');
         setStoreError(result.error || null);
         return;
       }
@@ -35,10 +42,10 @@ export default function AdminLogin() {
         setUser(result.data.user);
         setAuthenticated(true);
         setStoreError(null);
-        router.push('/admin');
+        router.push('/admin/dashboard');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t('login.error.unknown');
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
       setStoreError(errorMessage);
     } finally {
@@ -51,12 +58,12 @@ export default function AdminLogin() {
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">🚀</div>
+          <div className="text-5xl mb-4">🔐</div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            {t('login.title')}
+            Admin Panel
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            {t('login.subtitle')}
+            Secure Access Required
           </p>
         </div>
 
@@ -69,37 +76,39 @@ export default function AdminLogin() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Input */}
+            {/* Username Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                {t('login.email')}
+              <label htmlFor="username" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                Username
               </label>
               <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('login.email_placeholder')}
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter admin username"
                 disabled={isLoading}
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 required
+                autoComplete="username"
               />
             </div>
 
             {/* Password Input */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                {t('login.password')}
+                Password
               </label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('login.password_placeholder')}
+                placeholder="Enter admin password"
                 disabled={isLoading}
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 required
+                autoComplete="current-password"
               />
             </div>
 
@@ -107,30 +116,30 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+              className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-slate-400 disabled:to-slate-400 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
             >
               {isLoading && <Loader />}
-              {isLoading ? t('login.signing_in') : t('login.sign_in')}
+              {isLoading ? 'Entering Admin Panel...' : 'Enter Admin Panel'}
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm">
-            <p className="font-medium text-slate-900 dark:text-white mb-2">
-              {t('login.demo_title')}
+          {/* Test Credentials */}
+          <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm">
+            <p className="font-medium text-yellow-900 dark:text-yellow-200 mb-2">
+              Test Credentials (Development Only)
             </p>
-            <p className="text-slate-600 dark:text-slate-400">
-              Email: admin@example.com
+            <p className="text-yellow-800 dark:text-yellow-300 mb-1 text-xs">
+              <strong>Admin 1:</strong> offer / SecurePassword123!@#
             </p>
-            <p className="text-slate-600 dark:text-slate-400">
-              Password: password123
+            <p className="text-yellow-800 dark:text-yellow-300 text-xs">
+              <strong>Admin 2:</strong> or / SecurePassword456!@#
             </p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-slate-600 dark:text-slate-400">
-          <p>{t('login.footer')}</p>
+          <p>DIVE DROP Admin Portal - Secure Access Only</p>
         </div>
       </div>
     </div>

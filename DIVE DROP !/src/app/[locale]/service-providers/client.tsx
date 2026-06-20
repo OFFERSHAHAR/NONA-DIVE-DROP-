@@ -5,7 +5,7 @@ import { useLocale } from 'next-intl';
 import { ResponsiveGrid } from '@/components/ResponsiveGrid';
 import { ServiceProviderCard } from '@/components/ServiceProviderCard';
 import { ServiceProviderSearch } from '@/components/ServiceProviderSearch';
-import { useServiceProviderStore } from '@/store/serviceProviderStore';
+import { useServiceProviderStore } from '@/stores';
 import { serviceProviderClient } from '@/lib/service-provider/client';
 import type { ProviderFilters } from '@/types/service-provider';
 

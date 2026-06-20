@@ -1,0 +1,379 @@
+name: Monitoring & Alerts
+
+on:
+  schedule:
+    # Check every hour for issues
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry-run mode (report only, no alerts)'
+        required: false
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [health-check]
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  PRODUCTION_URL: ${{ secrets.PRODUCTION_APP_URL }}
+  STAGING_URL: ${{ secrets.STAGING_APP_URL }}
+  DRY_RUN: ${{ github.event.inputs.dry-run || false }}
+
+jobs:
+  uptime-monitoring:
+    name: Uptime Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      production-status: ${{ steps.production-check.outputs.status }}
+      staging-status: ${{ steps.staging-check.outputs.status }}
+    steps:
+      - name: Check production uptime
+        id: production-check
+        run: |
+          echo "Checking production uptime..."
+          HEALTH_URL="${PRODUCTION_URL}/api/health"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" "$HEALTH_URL" || echo "ERROR\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          RESPONSE_BODY=$(echo "$RESPONSE" | head -n-1)
+
+          echo "Response Code: $HTTP_CODE"
+          echo "Response: $RESPONSE_BODY"
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "status=up" >> $GITHUB_OUTPUT
+            echo "✓ Production is UP"
+          else
+            echo "status=down" >> $GITHUB_OUTPUT
+            echo "❌ Production is DOWN (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Check staging uptime
+        id: staging-check
+        run: |
+          echo "Checking staging uptime..."
+          HEALTH_URL="${STAGING_URL}/api/health"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" "$HEALTH_URL" || echo "ERROR\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "status=up" >> $GITHUB_OUTPUT
+            echo "✓ Staging is UP"
+          else
+            echo "status=down" >> $GITHUB_OUTPUT
+            echo "⚠ Staging is DOWN (HTTP $HTTP_CODE)"
+          fi
+        continue-on-error: true
+
+      - name: Alert on downtime
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dryRun = '${{ env.DRY_RUN }}' === 'true';
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['downtime-alert']
+            });
+
+            if (issues.data.length === 0 && !dryRun) {
+              github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 Production/Staging Downtime Detected',
+                body: `**Downtime Alert**\n\nProduction Status: ${{ steps.production-check.outputs.status }}\nStaging Status: ${{ steps.staging-check.outputs.status }}\n\nTime: ${new Date().toISOString()}`,
+                labels: ['downtime-alert', 'priority-high']
+              });
+            } else if (dryRun) {
+              console.log('DRY-RUN: Would create downtime alert');
+            }
+
+  performance-monitoring:
+    name: Performance Metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          npm install -g lighthouse-cli puppeteer
+
+      - name: Run Lighthouse audit (dry-run check)
+        id: dry-run-check
+        run: |
+          if [ "${{ env.DRY_RUN }}" = "true" ]; then
+            echo "is_dry_run=true" >> $GITHUB_OUTPUT
+            echo "🏃 DRY-RUN: Skipping Lighthouse audit"
+          else
+            echo "is_dry_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Lighthouse audit
+        if: steps.dry-run-check.outputs.is_dry_run == 'false'
+        id: lighthouse
+        run: |
+          cat > lighthouse-audit.mjs << 'EOF'
+          import lighthouse from 'lighthouse';
+          import chromeLauncher from 'chrome-launcher';
+
+          const url = process.env.PRODUCTION_URL;
+          const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless'] });
+
+          const options = {
+            logLevel: 'info',
+            output: 'json',
+            port: chrome.port,
+          };
+
+          try {
+            const runnerResult = await lighthouse(url, options);
+            const lhr = runnerResult.lhr;
+
+            console.log('📊 Lighthouse Scores:');
+            console.log(`- Performance: ${lhr.categories.performance.score * 100}`);
+            console.log(`- Accessibility: ${lhr.categories.accessibility.score * 100}`);
+            console.log(`- Best Practices: ${lhr.categories['best-practices'].score * 100}`);
+            console.log(`- SEO: ${lhr.categories.seo.score * 100}`);
+            console.log(`- PWA: ${lhr.categories.pwa.score * 100}`);
+
+            // Save report
+            require('fs').writeFileSync('lighthouse-report.json', JSON.stringify(lhr));
+
+            process.exit(lhr.categories.performance.score >= 0.85 ? 0 : 1);
+          } finally {
+            await chrome.kill();
+          }
+          EOF
+
+          node lighthouse-audit.mjs || true
+        continue-on-error: true
+
+      - name: Parse Lighthouse results
+        if: always()
+        run: |
+          if [ -f "lighthouse-report.json" ]; then
+            node <<'EOF'
+            const report = require('./lighthouse-report.json');
+            console.log('\n## Performance Report');
+            console.log(`Performance Score: ${(report.categories.performance.score * 100).toFixed(0)}/100`);
+            console.log(`Accessibility Score: ${(report.categories.accessibility.score * 100).toFixed(0)}/100`);
+            console.log(`Best Practices: ${(report.categories['best-practices'].score * 100).toFixed(0)}/100`);
+            console.log(`SEO Score: ${(report.categories.seo.score * 100).toFixed(0)}/100`);
+
+            // Check metrics
+            const metrics = report.audits.metrics.details.items[0];
+            console.log('\n### Core Web Vitals');
+            console.log(`First Contentful Paint: ${metrics.firstContentfulPaint}ms`);
+            console.log(`Largest Contentful Paint: ${metrics.largestContentfulPaint}ms`);
+            console.log(`Cumulative Layout Shift: ${metrics.cumulativeLayoutShift}`);
+            EOF
+          fi
+        continue-on-error: true
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: lighthouse-report.json
+          retention-days: 30
+
+  api-response-monitoring:
+    name: API Response Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Test API endpoints
+        run: |
+          cat > api-monitor.sh << 'EOF'
+          #!/bin/bash
+
+          BASE_URL="${PRODUCTION_URL}"
+          TIMEOUT=10
+
+          echo "## API Health Check Report" > api-report.md
+          echo "" >> api-report.md
+          echo "Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> api-report.md
+          echo "" >> api-report.md
+
+          endpoints=(
+            "GET /api/health:health"
+            "GET /en:homepage"
+            "GET /he:hebrew-homepage"
+            "GET /en/auth/login:login"
+          )
+
+          for endpoint in "${endpoints[@]}"; do
+            METHOD=$(echo $endpoint | cut -d' ' -f1)
+            PATH=$(echo $endpoint | cut -d' ' -f2)
+            NAME=$(echo $endpoint | cut -d':' -f2)
+
+            echo "Testing $NAME..."
+            START=$(date +%s%N)
+            RESPONSE=$(curl -s -w "\n%{http_code}\n%{time_total}" -m $TIMEOUT -X $METHOD "$BASE_URL$PATH" || echo "ERROR\n000\n0")
+            END=$(date +%s%N)
+
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n2 | head -n1)
+            DURATION=$(echo "$RESPONSE" | tail -n1)
+
+            echo "- $NAME: HTTP $HTTP_CODE (${DURATION}s)" >> api-report.md
+
+            if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 500 ]; then
+              echo "❌ $NAME FAILED"
+            fi
+          done
+
+          cat api-report.md
+          EOF
+
+          chmod +x api-monitor.sh
+          ./api-monitor.sh
+        continue-on-error: true
+
+      - name: Upload API report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-monitor-report
+          path: api-report.md
+          retention-days: 30
+
+  database-health:
+    name: Database Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Test database connectivity
+        run: |
+          echo "Checking Supabase connection..."
+
+          curl -s -H "Authorization: Bearer ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/users?select=count" \
+            -m 10 > db-check-response.json 2>&1
+
+          echo "Database response:"
+          cat db-check-response.json
+
+          # Check if response is valid JSON
+          if jq empty db-check-response.json 2>/dev/null; then
+            echo "✓ Database is responding"
+          else
+            echo "⚠️ Database response may be invalid"
+          fi
+        continue-on-error: true
+
+      - name: Upload database check
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-health-check
+          path: db-check-response.json
+          retention-days: 30
+
+  error-tracking:
+    name: Error Rate Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check error logs
+        run: |
+          echo "Monitoring application error rates..."
+
+          cat > error-monitor.md << 'EOF'
+          # Error Rate Monitor
+
+          ## Integration Points
+
+          This workflow should be connected to:
+
+          1. **Sentry** (if configured)
+             - Query error events from last hour
+             - Alert if error rate exceeds threshold
+             - Check for recurring issues
+
+          2. **Vercel Analytics** (native)
+             - Monitor Web Vitals
+             - Track error rate
+             - Check serverless function duration
+
+          3. **Supabase Logs**
+             - Monitor database errors
+             - Check API errors
+             - Review authentication failures
+
+          4. **Application Logs**
+             - Server-side logging to centralized system
+             - Client-side error tracking
+             - Performance metrics collection
+
+          ## Setup Instructions
+
+          To activate error tracking:
+
+          1. **Sentry Setup**:
+             ```bash
+             npm install @sentry/nextjs
+             ```
+
+          2. **Add Sentry Configuration** to next.config.ts:
+             ```typescript
+             import * as Sentry from "@sentry/nextjs";
+
+             const nextConfig = { /* ... */ };
+
+             export default Sentry.withSentryConfig(nextConfig, {
+               org: "your-org",
+               project: "your-project",
+             });
+             ```
+
+          3. **Set Secrets**:
+             - SENTRY_AUTH_TOKEN
+             - SENTRY_ORG
+             - SENTRY_PROJECT
+
+          4. **Enable GitHub Integration** in Sentry for automatic notifications
+
+          EOF
+
+          cat error-monitor.md
+        continue-on-error: true
+
+  monitoring-summary:
+    name: Monitoring Summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [uptime-monitoring, performance-monitoring, api-response-monitoring, database-health]
+    steps:
+      - name: Generate monitoring summary
+        run: |
+          echo "## Monitoring & Health Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Status Overview" >> $GITHUB_STEP_SUMMARY
+          echo "- Uptime Monitoring: ${{ needs.uptime-monitoring.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: ${{ needs.performance-monitoring.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- API Health: ${{ needs.api-response-monitoring.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Database: ${{ needs.database-health.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Service Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Production: ${{ needs.uptime-monitoring.outputs.production-status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Staging: ${{ needs.uptime-monitoring.outputs.staging-status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Action Items" >> $GITHUB_STEP_SUMMARY
+          echo "1. Check artifacts for detailed reports" >> $GITHUB_STEP_SUMMARY
+          echo "2. Review Lighthouse audit results" >> $GITHUB_STEP_SUMMARY
+          echo "3. Verify API response times" >> $GITHUB_STEP_SUMMARY
+          echo "4. Confirm database connectivity" >> $GITHUB_STEP_SUMMARY

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { AppNavigation } from '@/components/AppNavigation';
 import { Header } from '@/components/Header';
+import { AuthProvider } from './AuthProvider';
 import '../globals.css';
 import '../../styles/design-system.css';
 
@@ -37,9 +38,11 @@ export default async function LocaleLayout({
       </head>
       <body className="bg-light-bg dark:bg-dark-bg text-text-primary dark:text-text-light">
         <NextIntlClientProvider locale={locale}>
-          <Header />
-          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
-          <AppNavigation />
+          <AuthProvider>
+            <Header />
+            <main className="min-h-screen pb-20 md:pb-0">{children}</main>
+            <AppNavigation />
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

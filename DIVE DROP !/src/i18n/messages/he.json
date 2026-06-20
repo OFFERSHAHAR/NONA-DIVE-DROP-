@@ -29,7 +29,20 @@
     "register_link": "צור אחד",
     "forgot_password": "שכחת סיסמה?",
     "registration_success": "ההרשמה הצליחה! אנא אמת את דוא\"ל שלך.",
-    "password_mismatch": "הסיסמאות אינן תואמות"
+    "password_mismatch": "הסיסמאות אינן תואמות",
+    "verification": {
+      "title": "אמת את הדוא\"ל שלך",
+      "subtitle": "שלחנו קישור אימות לכתובת הדוא\"ל שלך",
+      "check_inbox": "בדוק את תיבת הדואר הנכנס שלך",
+      "check_spam": "בדוק את תיקיית הספאם אם אתה לא רואה אותה",
+      "verification_success": "דוא\"ל אומת בהצלחה!",
+      "verification_error": "האימות נכשל",
+      "link_expired": "קישור האימות פקע. אנא בקש אחד חדש.",
+      "invalid_token": "קישור אימות לא תקין",
+      "resend_button": "שלח שוב דוא\"ל אימות",
+      "resend_success": "דוא\"ל אימות נשלח בהצלחה",
+      "already_verified": "דוא\"ל זה כבר אומת"
+    }
   },
   "navigation": {
     "home": "בית",

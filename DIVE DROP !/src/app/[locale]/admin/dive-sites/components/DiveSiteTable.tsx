@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import { DiveSite } from '@/lib/types/admin';
 import { deleteDiveSite } from '../../actions/adminActions';
 

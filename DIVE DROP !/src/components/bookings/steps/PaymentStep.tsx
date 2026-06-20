@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useBookingStore } from '@/store/bookingStore';
+import { useBookingStore } from '@/stores';
 import { useTranslations } from 'next-intl';
 import { calculateTotalCost } from '@/lib/bookings/utils';
 

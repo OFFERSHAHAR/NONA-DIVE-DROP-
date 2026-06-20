@@ -8,7 +8,7 @@ import { EquipmentService } from '@/lib/equipment/equipment-service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createClient(

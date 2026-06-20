@@ -1,4 +1,10 @@
-# DIVE DROP Booking System - Detailed Implementation Roadmap
+# DIVE DROP Implementation Roadmap
+
+**4-Week Execution Plan | Security → Performance → Architecture → Testing**
+
+**Period:** Weeks 1-4 (July 1 - July 28, 2026)  
+**Version Target:** v1.1 + Security Hardening  
+**Status:** Planning Phase
 
 ## Overview
 

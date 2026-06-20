@@ -54,10 +54,19 @@ export async function withAdminAuth(
       };
     }
 
-    // TODO: Query custom admin role from users table after schema update
-    // For now, assume all authenticated users can access admin panel
-    // In production, check role field: role === 'admin'
-    const isAdmin = true;
+    // Verify admin role from admin_users table
+    const { data: adminUser, error: adminError } = await supabase
+      .from('admin_users')
+      .select('role, is_active, status')
+      .eq('user_id', user.id)
+      .single();
+
+    const isAdmin =
+      !adminError &&
+      adminUser &&
+      adminUser.is_active === true &&
+      adminUser.status === 'active' &&
+      (adminUser.role === 'admin' || adminUser.role === 'super_admin');
 
     if (!isAdmin) {
       return {

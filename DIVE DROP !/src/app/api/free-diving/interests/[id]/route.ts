@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 // GET: Fetch interest details with contact reveal
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -52,7 +52,7 @@ export async function GET(
 // PUT: Reveal contact
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -96,7 +96,7 @@ export async function PUT(
 // DELETE: Remove interest
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();

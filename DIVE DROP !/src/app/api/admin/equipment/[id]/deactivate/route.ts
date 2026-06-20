@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // POST /api/admin/equipment/[id]/deactivate
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // In a real implementation, you would update Supabase
     // const supabase = createAdminClient();

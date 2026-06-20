@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import { fetchShuttles, fetchUsers } from '../actions/adminActions';
 import ShuttleTable from './components/ShuttleTable';
 import ShuttleModal from './components/ShuttleModal';

@@ -1,17 +1,70 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import Anthropic from '@anthropic-ai/sdk'
-import { PerfectDayAnswers, DivePlan } from '@/types/agent'
+/**
+ * Perfect Day Agent Route
+ *
+ * SECURITY FIXES:
+ * 1. Validates request body with Zod schema
+ * 2. Detects prompt injection attempts
+ * 3. Sanitizes user input before passing to LLM
+ * 4. Uses Next.js 16 async params pattern
+ *
+ * This route handles recommendations for perfect dive days based on user profile.
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import Anthropic from '@anthropic-ai/sdk';
+import { PerfectDayAnswers, DivePlan } from '@/types/agent';
+import {
+  PerfectDayAgentRequestSchema,
+  validateAgentRequest,
+  detectPromptInjection,
+  sanitizePromptInput,
+  getSystemPrompt,
+  constructUserPrompt,
+} from '@/lib/agent/prompt-sanitization';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
-})
+});
 
+/**
+ * POST /api/agent/perfect-day
+ *
+ * Request body:
+ * {
+ *   "answers": {
+ *     "experienceLevel": "beginner" | "intermediate" | "advanced" | "expert",
+ *     "goal": "string (max 500 chars)",
+ *     "guidePreference": "yes" | "no" | "maybe"
+ *   },
+ *   "locale": "en" | "he" (optional, defaults to "en")
+ * }
+ *
+ * Response:
+ * {
+ *   "plan": {
+ *     "siteId": "string",
+ *     "siteName": "string",
+ *     "siteDepth": number,
+ *     "siteDifficulty": string,
+ *     "siteLocation": string,
+ *     "instructors": [{ "id": "string", "firstName": string, "lastName": string }],
+ *     "message": "string",
+ *     "tips": ["string", "string", "string"]
+ *   }
+ * }
+ *
+ * Error responses:
+ * - 401: Unauthorized (user not authenticated)
+ * - 400: Bad request (validation failed)
+ * - 403: Forbidden (prompt injection detected)
+ * - 500: Server error
+ */
 export async function POST(request: NextRequest) {
   try {
-    // Auth guard
-    const cookieStore = await cookies()
+    // ===== STEP 1: Authentication =====
+    const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,36 +74,77 @@ export async function POST(request: NextRequest) {
           setAll: (cookiesToSet) => {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-            )
+            );
           },
         },
       }
-    )
+    );
 
     const {
       data: { user },
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json()
-    const answers: PerfectDayAnswers = body.answers
-    const locale: string = body.locale || 'en'
+    // ===== STEP 2: Parse and validate request body =====
+    let requestBody: unknown;
+    try {
+      requestBody = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
 
-    // Fetch dive sites (all for now, filter by difficulty in prompt)
+    // SECURITY FIX 3: Validate request against schema
+    const validation = validateAgentRequest(requestBody);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error || 'Request validation failed' },
+        { status: 400 }
+      );
+    }
+
+    const validatedRequest = validation.data!;
+    const answers = validatedRequest.answers;
+    const locale = validatedRequest.locale;
+
+    // ===== STEP 3: Prompt injection detection =====
+    // Check each user-provided field for injection attempts
+    const injectionDetection = detectPromptInjection(answers.goal);
+
+    if (injectionDetection.isInjection) {
+      console.warn(
+        `Prompt injection attempt detected for user ${user.id}:`,
+        injectionDetection.detectedPatterns
+      );
+
+      return NextResponse.json(
+        {
+          error:
+            'Your input contains suspicious patterns. ' +
+            'Please use natural language without special instructions.',
+        },
+        { status: 403 }
+      );
+    }
+
+    // ===== STEP 4: Fetch data from database =====
+    // Fetch dive sites
     const { data: sites, error: sitesError } = await supabase
       .from('dive_sites')
       .select('*')
-      .limit(10)
+      .limit(10);
 
     if (sitesError || !sites) {
-      console.error('Supabase fetch sites error:', sitesError)
+      console.error('Supabase fetch sites error:', sitesError);
       return NextResponse.json(
         { error: 'Failed to fetch dive sites' },
         { status: 500 }
-      )
+      );
     }
 
     // Fetch instructors
@@ -58,52 +152,29 @@ export async function POST(request: NextRequest) {
       .from('users')
       .select('id, first_name, last_name')
       .eq('diving_experience', 'instructor')
-      .limit(6)
+      .limit(6);
 
     if (instructorsError) {
-      console.error('Supabase fetch instructors error:', instructorsError)
+      console.error('Supabase fetch instructors error:', instructorsError);
     }
 
-    // Build prompt
-    const language = locale === 'he' ? 'Hebrew' : 'English'
+    // ===== STEP 5: Construct safe prompts =====
+    const language = locale === 'he' ? 'Hebrew' : 'English';
 
-    const systemPrompt = `You are a dive planning assistant for DiveDrop, a scuba diving companion app.
-Your job is to recommend a perfect dive site and instructors based on the diver's profile.
-Always respond with ONLY valid JSON, no markdown, no explanation.`
+    // Get system prompt (no injection risk - hardcoded)
+    const systemPrompt = getSystemPrompt();
 
-    const userPrompt = `
-Diver profile:
-- Experience Level: ${answers.experienceLevel}
-- Goal for today: ${answers.goal}
-- Wants instructor: ${answers.guidePreference}
-- Preferred language: ${language}
+    // Construct user prompt with sanitized input and clear boundaries
+    const userPrompt = constructUserPrompt(
+      answers.experienceLevel,
+      answers.goal,
+      answers.guidePreference,
+      language,
+      JSON.stringify(sites, null, 2),
+      JSON.stringify(instructors || [], null, 2)
+    );
 
-Available dive sites:
-${JSON.stringify(sites, null, 2)}
-
-Available instructors:
-${JSON.stringify(instructors || [], null, 2)}
-
-Please recommend:
-1. The best matching dive site
-2. Appropriate instructors (0-3 based on preference)
-3. A personalized 2-3 sentence recommendation message (in ${language})
-4. 3 practical tips for this dive
-
-Return ONLY this exact JSON structure (no other text):
-{
-  "siteId": "uuid-string",
-  "siteName": "string",
-  "siteDepth": number,
-  "siteDifficulty": "string",
-  "siteLocation": "string",
-  "instructors": [{"id":"uuid","firstName":"string","lastName":"string"}],
-  "message": "personalized message in ${language}",
-  "tips": ["tip1", "tip2", "tip3"]
-}
-`
-
-    // Call Claude Haiku
+    // ===== STEP 6: Call Anthropic API =====
     const message = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 400,
@@ -114,29 +185,33 @@ Return ONLY this exact JSON structure (no other text):
           content: userPrompt,
         },
       ],
-    })
+    });
 
-    // Extract JSON from response
+    // ===== STEP 7: Parse and validate response =====
     const responseText =
-      message.content[0].type === 'text' ? message.content[0].text : ''
+      message.content[0].type === 'text' ? message.content[0].text : '';
 
-    let plan: DivePlan
+    let plan: DivePlan;
     try {
-      plan = JSON.parse(responseText)
+      plan = JSON.parse(responseText);
     } catch (e) {
-      console.error('Failed to parse Claude response:', responseText)
+      console.error('Failed to parse Claude response:', responseText);
       return NextResponse.json(
-        { error: 'Failed to parse AI response' },
+        {
+          error:
+            'Failed to parse AI response. Please try again with different inputs.',
+        },
         { status: 500 }
-      )
+      );
     }
 
-    return NextResponse.json({ plan })
+    // ===== STEP 8: Return successful response =====
+    return NextResponse.json({ plan });
   } catch (error) {
-    console.error('Perfect day API error:', error)
+    console.error('Perfect day API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error. Please try again later.' },
       { status: 500 }
-    )
+    );
   }
 }

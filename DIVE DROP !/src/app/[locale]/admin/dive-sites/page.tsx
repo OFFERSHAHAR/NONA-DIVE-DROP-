@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import { fetchDiveSites } from '../actions/adminActions';
 import DiveSiteTable from './components/DiveSiteTable';
 import DiveSiteModal from './components/DiveSiteModal';

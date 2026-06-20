@@ -1,25 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { isModerator } from '@/lib/admin/permissions';
 
 export async function GET(request: NextRequest) {
   try {
+    // Verify moderator or admin role
+    const hasPermission = await isModerator();
+    if (!hasPermission) {
+      return NextResponse.json({ error: 'Forbidden: Moderator access required' }, { status: 403 });
+    }
+
     const supabase = await createClient();
-
-    // Verify admin
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { data: adminUser } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (adminUser?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     // Get query parameters
     const divesite = request.nextUrl.searchParams.get('dive_site_id');

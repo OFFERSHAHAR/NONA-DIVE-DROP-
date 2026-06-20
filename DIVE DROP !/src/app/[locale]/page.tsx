@@ -1,6 +1,12 @@
-export const dynamic = 'force-dynamic';
+/**
+ * Performance Optimization: ISR (Incremental Static Regeneration)
+ * Revalidates every 1 hour (3600 seconds) to balance freshness with performance
+ * Eliminates force-dynamic render overhead
+ */
+export const revalidate = 3600;
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { getLocale } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
@@ -51,7 +57,14 @@ export default async function HomePage() {
       <div dir="ltr" className="mx-auto grid max-w-[1536px] gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_475px] lg:gap-6 lg:p-0">
         <div dir={isRTL ? 'rtl' : 'ltr'} className="min-w-0 space-y-5">
           <section className="relative h-[690px] overflow-hidden rounded-b-[32px] shadow-[0_18px_45px_rgba(14,61,112,.16)] lg:h-[562px] lg:rounded-[0_0_28px_0]">
-            <img src="/divedrop-hero-v2.png" alt="סירת צלילה וצולל מתחת למים" className="absolute inset-0 h-full w-full object-cover object-[38%_center] lg:object-center" />
+            <Image
+              src="/divedrop-hero-v2.png"
+              alt="סירת צלילה וצולל מתחת למים"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 100vw, 100vw"
+              className="absolute inset-0 h-full w-full object-cover object-[38%_center] lg:object-center"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-[#001e46]/80 via-transparent to-transparent lg:bg-gradient-to-l lg:from-[#001c45]/65 lg:via-transparent lg:to-transparent" />
 
             <div className="absolute inset-x-7 bottom-[330px] text-right text-white lg:inset-x-auto lg:bottom-auto lg:right-14 lg:top-1/2 lg:w-[40%] lg:-translate-y-1/2">
@@ -83,8 +96,15 @@ export default async function HomePage() {
             <div className="flex snap-x gap-4 overflow-x-auto pb-2 lg:overflow-hidden">
               {displaySites.map((site, index) => (
                 <article key={site.id} className="w-[230px] flex-none snap-start overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_8px_22px_rgba(17,63,105,.12)] sm:w-[260px] lg:w-auto lg:min-w-0 lg:flex-1">
-                  <div className="relative h-40 overflow-hidden">
-                    <img src={site.image} alt={site.name} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
+                  <div className="relative h-40 w-full overflow-hidden">
+                    <Image
+                      src={site.image}
+                      alt={site.name}
+                      fill
+                      sizes="(max-width: 640px) 230px, (max-width: 1024px) 260px, 100%"
+                      className="object-cover transition duration-300 hover:scale-105"
+                      loading="lazy"
+                    />
                     <span className={`absolute left-3 top-3 flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold text-white ${recommendedBadges[index].color}`}><AppIcon name={recommendedBadges[index].icon} className="h-3.5 w-3.5" />{recommendedBadges[index].label}</span>
                     <AppIcon name="heart" className="absolute right-3 top-3 h-8 w-8 text-white drop-shadow" />
                   </div>
@@ -101,7 +121,13 @@ export default async function HomePage() {
 
         <aside dir={isRTL ? 'rtl' : 'ltr'} className="space-y-5 px-4 lg:px-0 lg:pr-6 lg:pt-5">
           <div dir="ltr" className="hidden items-center justify-center py-2 lg:flex">
-            <img src="/assets/logo/divedrop-logo-full.svg" alt="DiveDrop" className="h-[88px] w-auto" />
+            <Image
+              src="/assets/logo/divedrop-logo-full.svg"
+              alt="DiveDrop"
+              width={88}
+              height={88}
+              className="h-[88px] w-auto"
+            />
           </div>
 
           <section className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
@@ -121,7 +147,18 @@ export default async function HomePage() {
           <section className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
             <h2 className="mb-4 flex items-center justify-between text-2xl font-extrabold leading-8"><AppIcon name="calendar" className="h-7 w-7 text-blue-600" />{isRTL ? 'הצלילות הקרובות שלך' : 'Your upcoming dives'}</h2>
             <div className="rounded-2xl border border-slate-100 p-4 shadow-sm">
-              <div className="flex items-center gap-4"><img src={displaySites[3].image} alt="שונית הכרישים" className="h-20 w-20 rounded-full object-cover" /><div><h3 className="!text-xl !leading-7 font-extrabold">{isRTL ? 'שונית הכרישים' : 'Shark Reef'}</h3><p className="text-slate-500">{isRTL ? 'צלילת סירה מודרכת' : 'Guided boat dive'}</p></div></div>
+              <div className="flex items-center gap-4">
+                <div className="relative h-20 w-20">
+                  <Image
+                    src={displaySites[3].image}
+                    alt="שונית הכרישים"
+                    fill
+                    sizes="80px"
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                <div><h3 className="!text-xl !leading-7 font-extrabold">{isRTL ? 'שונית הכרישים' : 'Shark Reef'}</h3><p className="text-slate-500">{isRTL ? 'צלילת סירה מודרכת' : 'Guided boat dive'}</p></div>
+              </div>
               <div className="my-4 flex justify-around text-sm text-slate-600"><span className="flex items-center gap-1.5"><AppIcon name="clock" className="h-4 w-4" />08:00</span><span className="flex items-center gap-1.5"><AppIcon name="calendar" className="h-4 w-4" />20.05.2024</span></div>
               <div className="flex gap-2"><span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-2 text-xs"><AppIcon name="users" className="h-4 w-4" />6 משתתפים</span><span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-2 text-xs"><AppIcon name="user" className="h-4 w-4" />מדריך: אורי לוי</span></div>
               <Link href={`/${locale}/my-dives`} className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-700">{isRTL ? 'פרטי הצלילה ‹' : 'Dive details ›'}</Link>

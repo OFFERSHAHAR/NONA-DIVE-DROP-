@@ -23,7 +23,13 @@
       "title": "Shuttle Management",
       "description": "Manage shuttle fleet and drivers"
     },
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "system_health": "System Health",
+    "database": "Database",
+    "performance": "Performance",
+    "quick_actions": "Quick Actions",
+    "analytics": "Analytics Overview",
+    "management_centers": "Management Centers"
   },
   "nav": {
     "dashboard": "Dashboard",

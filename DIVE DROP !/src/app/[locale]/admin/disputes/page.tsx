@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { useEquipmentAdminStore } from '@/lib/stores/equipmentAdminStore';
+import { useEquipmentAdminStore } from '@/stores';
 import { Dispute } from '@/lib/types/equipment';
 import DisputeTable from './components/DisputeTable';
 import DisputeModal from './components/DisputeModal';

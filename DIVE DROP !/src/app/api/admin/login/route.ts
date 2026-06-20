@@ -4,16 +4,13 @@ import { createAdminSession } from '@/lib/admin/jwt-service';
 import { verifyPasswordSync } from '@/lib/security/password-validation';
 import { constantTimeEqual } from '@/lib/security/password-validation';
 import {
-  checkRateLimit,
-  recordFailedAttempt,
-  recordSuccessfulAttempt,
+  withRateLimit,
+  recordFailedLogin,
+  resetRateLimit,
   RATE_LIMIT_CONFIGS,
-  startRateLimitCleanup,
+  getClientIP as getRateLimiterClientIP,
 } from '@/lib/security/rate-limiter';
 import { validateCSRFMiddleware, createResponseWithCSRFToken } from '@/lib/security/csrf';
-
-// Initialize rate limiter cleanup on first request
-let rateLimiterInitialized = false;
 
 /**
  * Admin login request schema with Zod validation
@@ -55,27 +52,8 @@ function validateAdminCredentialsSecure(username: string, password: string): boo
   return match1 || match2;
 }
 
-/**
- * Get client IP address for rate limiting
- */
-function getClientIP(request: NextRequest): string {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',')[0] ||
-    request.headers.get('x-real-ip') ||
-    request.ip ||
-    'unknown'
-  );
-}
-
 export async function POST(request: NextRequest) {
-  // Initialize rate limiter on first request
-  if (!rateLimiterInitialized) {
-    startRateLimitCleanup();
-    rateLimiterInitialized = true;
-  }
-
-  const clientIP = getClientIP(request);
-  const rateLimitKey = `admin-login:${clientIP}`;
+  const clientIP = getRateLimiterClientIP(request);
 
   try {
     // SECURITY: Check CSRF token first
@@ -91,27 +69,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // SECURITY: Check rate limit (5 failed attempts = 15 min lockout)
-    const rateLimitStatus = checkRateLimit(rateLimitKey, RATE_LIMIT_CONFIGS.adminLogin);
-
-    if (rateLimitStatus.isLimited) {
-      console.warn(`[ADMIN AUTH] Rate limit exceeded for IP: ${clientIP}`, {
-        attempts: rateLimitStatus.attempts,
-        remainingTime: rateLimitStatus.remainingTime,
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: rateLimitStatus.message || 'Too many login attempts. Please try again later.',
-        },
-        {
-          status: 429,
-          headers: {
-            'Retry-After': Math.ceil((rateLimitStatus.remainingTime || 0) / 1000).toString(),
-          },
-        }
-      );
+    // SECURITY: Check rate limit using middleware
+    const rateLimitResponse = await withRateLimit(request);
+    if (rateLimitResponse) {
+      console.warn(`[ADMIN AUTH] Rate limit exceeded for IP: ${clientIP}`);
+      return rateLimitResponse;
     }
 
     // Parse and validate request body
@@ -143,26 +105,18 @@ export async function POST(request: NextRequest) {
     const credentialsValid = validateAdminCredentialsSecure(username, password);
 
     if (!credentialsValid) {
-      // Record failed attempt
-      const failureResult = recordFailedAttempt(
-        rateLimitKey,
-        RATE_LIMIT_CONFIGS.adminLogin,
-        clientIP
-      );
+      // Record failed login attempt
+      const failureResult = await recordFailedLogin(request);
 
       console.warn(`[ADMIN AUTH] Failed login attempt for IP: ${clientIP}`, {
         username,
-        attempts: failureResult.attempts,
-        locked: failureResult.isNowLocked,
+        locked: !failureResult.allowed,
       });
 
       // Generic error message (don't reveal if username exists)
       let errorMessage = 'Invalid username or password.';
-      if (failureResult.isNowLocked) {
-        const lockoutMinutes = Math.ceil(
-          RATE_LIMIT_CONFIGS.adminLogin.lockoutMs / 1000 / 60
-        );
-        errorMessage = `Too many failed attempts. Account locked for ${lockoutMinutes} minutes.`;
+      if (!failureResult.allowed) {
+        errorMessage = failureResult.message || 'Too many failed attempts. Please try again later.';
       }
 
       return NextResponse.json(
@@ -175,7 +129,7 @@ export async function POST(request: NextRequest) {
     }
 
     // SECURITY: Reset rate limit on successful login
-    recordSuccessfulAttempt(rateLimitKey);
+    await resetRateLimit(request);
 
     // Create admin session
     const session = await createAdminSession(username);

@@ -20,6 +20,7 @@ export default {
 
         // Backgrounds
         "dark-bg": "#0A1428",
+        "dark-ocean": "#051c30",
         "dark-surface": "#1A2332",
         "dark-surface-elevated": "#2A3340",
         "light-bg": "#FFFFFF",
@@ -109,8 +110,8 @@ export default {
 
       // Font Family
       fontFamily: {
-        sans: ["Inter", "SF Pro Display", "system-ui", "sans-serif"],
-        heading: ["Poppins", "Inter", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter, Inter)", "SF Pro Display", "system-ui", "sans-serif"],
+        heading: ["var(--font-poppins, Poppins)", "var(--font-inter, Inter)", "system-ui", "sans-serif"],
       },
 
       fontWeight: {

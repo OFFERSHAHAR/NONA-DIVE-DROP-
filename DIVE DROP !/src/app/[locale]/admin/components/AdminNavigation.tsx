@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import { useState } from 'react';
 
 export default function AdminNavigation() {
@@ -18,67 +18,91 @@ export default function AdminNavigation() {
       label: t('nav.dashboard'),
       href: '/admin',
       icon: '📊',
+      category: 'Main',
     },
     {
       label: 'Photo Moderation',
       href: '/admin/photos',
-      icon: '📸',
+      icon: '📷',
+      category: 'Content',
     },
     {
       label: t('nav.users'),
       href: '/admin/users',
       icon: '👥',
-    },
-    {
-      label: t('nav.dive_sites'),
-      href: '/admin/dive-sites',
-      icon: '🏄',
-    },
-    {
-      label: t('nav.shuttles'),
-      href: '/admin/shuttles',
-      icon: '🚐',
-    },
-    // Equipment Rental Section
-    {
-      label: 'Equipment Rental',
-      href: '/admin/equipment',
-      icon: '🎽',
-    },
-    {
-      label: 'Damage Reports',
-      href: '/admin/damage-reports',
-      icon: '⚠️',
+      category: 'Users',
     },
     {
       label: 'Problematic Users',
       href: '/admin/problematic-users',
       icon: '🚫',
+      category: 'Users',
     },
     {
-      label: 'Commissions',
-      href: '/admin/commissions',
-      icon: '💰',
+      label: t('nav.dive_sites'),
+      href: '/admin/dive-sites',
+      icon: '🏖️',
+      category: 'Locations',
+    },
+    {
+      label: t('nav.shuttles'),
+      href: '/admin/shuttles',
+      icon: '🚐',
+      category: 'Transportation',
+    },
+    {
+      label: 'Equipment Rental',
+      href: '/admin/equipment',
+      icon: '🎒',
+      category: 'Equipment',
+    },
+    {
+      label: 'Damage Reports',
+      href: '/admin/damage-reports',
+      icon: '⚠️',
+      category: 'Equipment',
     },
     {
       label: 'Missing Equipment',
       href: '/admin/missing-equipment',
       icon: '❌',
+      category: 'Equipment',
+    },
+    {
+      label: 'Commissions',
+      href: '/admin/commissions',
+      icon: '💰',
+      category: 'Finance',
     },
     {
       label: 'Disputes',
       href: '/admin/disputes',
       icon: '⚔️',
+      category: 'Support',
     },
     {
       label: 'Analytics',
       href: '/admin/equipment-analytics',
       icon: '📈',
+      category: 'Reports',
+    },
+    {
+      label: 'Audit Logs',
+      href: '/admin/audit-logs',
+      icon: '🔒',
+      category: 'System',
+    },
+    {
+      label: 'System Settings',
+      href: '/admin/system-settings',
+      icon: '🛠️',
+      category: 'System',
     },
     {
       label: t('nav.settings'),
       href: '/admin/settings',
       icon: '⚙️',
+      category: 'System',
     },
   ];
 
@@ -102,24 +126,43 @@ export default function AdminNavigation() {
 
       {/* Menu Items */}
       <div className="flex-1 overflow-y-auto py-6">
-        <div className="space-y-1 px-3">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                <span className="text-xl">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
+        <div className="space-y-4 px-3">
+          {(() => {
+            const categories = Array.from(new Set(menuItems.map((item) => item.category as string)));
+            return categories.map((category) => (
+              <div key={category}>
+                <p className="text-xs font-bold text-slate-500 uppercase px-4 mb-2">
+                  {category}
+                </p>
+                <div className="space-y-1">
+                  {menuItems
+                    .filter((item) => item.category === category)
+                    .map((item) => {
+                      const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
+                            isActive
+                              ? 'bg-blue-600 text-white shadow-lg'
+                              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                          }`}
+                        >
+                          <span className="text-xl group-hover:scale-110 transition-transform">
+                            {item.icon}
+                          </span>
+                          <span className="font-medium">{item.label}</span>
+                          {isActive && (
+                            <span className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                </div>
+              </div>
+            ));
+          })()}
         </div>
       </div>
 

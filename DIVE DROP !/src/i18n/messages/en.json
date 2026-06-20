@@ -29,7 +29,20 @@
     "register_link": "Create one",
     "forgot_password": "Forgot password?",
     "registration_success": "Registration successful! Please verify your email.",
-    "password_mismatch": "Passwords do not match"
+    "password_mismatch": "Passwords do not match",
+    "verification": {
+      "title": "Verify Your Email",
+      "subtitle": "We've sent a verification link to your email address",
+      "check_inbox": "Check your inbox",
+      "check_spam": "Check your spam folder if you don't see it",
+      "verification_success": "Email verified successfully!",
+      "verification_error": "Verification failed",
+      "link_expired": "Verification link has expired. Please request a new one.",
+      "invalid_token": "Invalid verification link",
+      "resend_button": "Resend Verification Email",
+      "resend_success": "Verification email sent successfully",
+      "already_verified": "This email has already been verified"
+    }
   },
   "navigation": {
     "home": "Home",

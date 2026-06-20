@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import { createUser, updateUser } from '../../actions/adminActions';
 import { createUserSchema, updateUserSchema } from '@/lib/validation/adminValidation';
 import { AdminUser } from '@/lib/types/admin';

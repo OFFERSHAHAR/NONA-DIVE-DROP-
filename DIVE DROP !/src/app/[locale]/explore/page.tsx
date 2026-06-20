@@ -1,6 +1,12 @@
-export const dynamic = 'force-dynamic';
+/**
+ * Performance Optimization: ISR (Incremental Static Regeneration)
+ * Revalidates every 1 hour (3600 seconds) to balance freshness with performance
+ * Eliminates force-dynamic render overhead
+ */
+export const revalidate = 3600;
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { getLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/Button';
@@ -131,11 +137,13 @@ function DiveSiteCardExplore({ site, locale, isRTL }: DiveSiteCardExploreProps) 
       className="h-full overflow-hidden cursor-pointer group rounded-[22px] border-0 bg-white p-0 transition-all hover:-translate-y-1 hover:shadow-xl"
     >
       {/* Image Container */}
-      <div className="w-full aspect-video bg-gradient-to-br from-accent/30 to-primary/30 overflow-hidden relative">
-        <img
+      <div className="relative w-full aspect-video bg-gradient-to-br from-accent/30 to-primary/30 overflow-hidden">
+        <Image
           src={site.image_url || getDiveSiteImage(site.name)}
           alt={site.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
 

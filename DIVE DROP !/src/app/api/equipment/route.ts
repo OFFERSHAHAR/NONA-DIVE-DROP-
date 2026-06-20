@@ -1,17 +1,18 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { EquipmentService } from '@/lib/equipment/equipment-service';
 import { equipmentCreateSchema, equipmentFilterSchema } from '@/lib/equipment/schemas';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    // Authenticate user via Supabase session (not header-based)
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    const session = request.headers.get('x-user-id');
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
     const validated = equipmentCreateSchema.parse(body);
 
     const service = new EquipmentService(supabase);
-    const equipment = await service.createEquipment(session, validated);
+    const equipment = await service.createEquipment(user.id, validated);
 
     return NextResponse.json(equipment, { status: 201 });
   } catch (error: any) {
@@ -32,10 +33,17 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = await createClient();
+
+    // Authenticate user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { searchParams } = new URL(request.url);
     const listerId = searchParams.get('lister_id');
@@ -45,6 +53,22 @@ export async function GET(request: NextRequest) {
         { error: 'lister_id parameter required' },
         { status: 400 }
       );
+    }
+
+    // Verify user owns this lister equipment or is admin
+    if (listerId !== user.id) {
+      const { data: adminUser } = await supabase
+        .from('admin_users')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!adminUser || !['admin', 'super_admin'].includes(adminUser.role)) {
+        return NextResponse.json(
+          { error: 'Forbidden: Cannot view other users equipment' },
+          { status: 403 }
+        );
+      }
     }
 
     const filters = {

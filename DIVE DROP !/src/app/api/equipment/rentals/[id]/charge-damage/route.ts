@@ -25,7 +25,7 @@ type RequestBody = z.infer<typeof damageReportSchema>;
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const rentalId = params.id;

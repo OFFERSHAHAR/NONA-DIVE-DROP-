@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // GET: Fetch a single free diving listing
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -39,7 +39,7 @@ export async function GET(
 // PUT: Update a free diving listing
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -89,7 +89,7 @@ export async function PUT(
 // DELETE: Delete a free diving listing
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();

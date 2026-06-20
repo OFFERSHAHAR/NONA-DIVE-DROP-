@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AppIcon } from '@/components/AppIcon';
 import { BuddyListingCard, BuddyListingForm, BuddyFilters, ContactRevealModal } from '@/components/find-buddy';
-import { useBuddyStore } from '@/store/buddy-store';
+import { useBuddyStore } from '@/stores';
 import type { BuddyListing, BuddyInterest, BuddyFilters as BuddyFiltersType } from '@/types/buddy';
 import type { CreateBuddyListingInput } from '@/lib/validations/buddy';
 

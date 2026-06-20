@@ -6,6 +6,7 @@ import { useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
+import { UserStatus } from '@/components/UserStatus';
 
 export interface HeaderProps {
   showNotificationBadge?: boolean;
@@ -73,20 +74,33 @@ export const Header: React.FC<HeaderProps> = ({
             <img src={isHome ? '/assets/logo/divedrop-logo-white.svg' : '/assets/logo/divedrop-logo-full.svg'} alt="DiveDrop" className={isHome ? 'h-11 w-auto' : 'h-12 w-auto'} />
           </Link>
 
-          {/* Right: Notification Bell */}
-          <button
-            aria-label={isRTL ? 'התראות' : 'Notifications'}
-            className={clsx('relative rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
-          >
-            <AppIcon name="bell" className={clsx('h-7 w-7', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')} />
+          {/* Right: User Status & Notification Bell */}
+          <div className="flex items-center gap-2">
+            {/* User Status */}
+            <div className="hidden sm:flex">
+              <UserStatus compact={false} />
+            </div>
 
-            {/* Notification Badge */}
-            {showNotificationBadge && notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[24px] h-6 px-1 bg-error text-white text-xs font-bold rounded-full">
-                {notificationCount > 99 ? '99+' : notificationCount}
-              </span>
-            )}
-          </button>
+            {/* Compact User Status for Mobile */}
+            <div className="sm:hidden">
+              <UserStatus compact={true} />
+            </div>
+
+            {/* Notification Bell */}
+            <button
+              aria-label={isRTL ? 'התראות' : 'Notifications'}
+              className={clsx('relative rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
+            >
+              <AppIcon name="bell" className={clsx('h-7 w-7', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')} />
+
+              {/* Notification Badge */}
+              {showNotificationBadge && notificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[24px] h-6 px-1 bg-error text-white text-xs font-bold rounded-full">
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 

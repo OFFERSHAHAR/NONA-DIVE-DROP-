@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAdminStore } from '@/lib/stores/adminStore';
+import { useAdminStore } from '@/stores';
 import AdminNavigation from './components/AdminNavigation';
 
 function Loader() {
@@ -31,9 +31,32 @@ export default function AdminLayout({
   useEffect(() => {
     if (!mounted) return;
 
+    // Verify admin session with API
+    const verifyAuth = async () => {
+      try {
+        const response = await fetch('/api/admin/verify');
+        const result = await response.json();
+
+        if (!result.success) {
+          // Token is invalid or expired, redirect to login
+          const { logout } = useAdminStore.getState();
+          logout();
+          router.push('/admin/login');
+        }
+      } catch (error) {
+        // If verification fails, redirect to login
+        const { logout } = useAdminStore.getState();
+        logout();
+        router.push('/admin/login');
+      }
+    };
+
     // Check authentication
     if (!isAuthenticated && !user) {
       router.push('/admin/login');
+    } else if (isAuthenticated && user) {
+      // Verify token is still valid
+      verifyAuth();
     }
   }, [mounted, isAuthenticated, user, router]);
 

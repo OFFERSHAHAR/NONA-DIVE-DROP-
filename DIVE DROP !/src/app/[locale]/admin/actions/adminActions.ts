@@ -70,25 +70,17 @@ const mockShuttles: Shuttle[] = [
   },
 ];
 
-// Authentication
+// Authentication - Now uses JWT API endpoint in /api/admin/login
+// This action is deprecated - use fetch('/api/admin/login') instead
 export async function loginAdmin(input: LoginInput): Promise<ApiResponse<{ user: AdminUser; token: string }>> {
   try {
-    // Mock authentication - in production, connect to your database
-    if (input.email === 'admin@example.com' && input.password === 'password123') {
-      const user = mockUsers[0];
-      return {
-        success: true,
-        data: {
-          user,
-          token: 'mock-jwt-token-' + Date.now(),
-        },
-      };
-    }
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
 
-    return {
-      success: false,
-      error: 'Invalid email or password',
-    };
+    return response.json();
   } catch (error) {
     return {
       success: false,

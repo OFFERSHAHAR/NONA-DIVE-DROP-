@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/stores';
 import { BookingCard } from '@/components/bookings/BookingCard';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

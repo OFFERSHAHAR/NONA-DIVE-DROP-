@@ -23,7 +23,13 @@
       "title": "ניהול וניטות",
       "description": "נהל את שיירת הוניטות והנהגים"
     },
-    "recent_activity": "פעילות אחרונה"
+    "recent_activity": "פעילות אחרונה",
+    "system_health": "בריאות המערכת",
+    "database": "מסד נתונים",
+    "performance": "ביצועים",
+    "quick_actions": "פעולות מהירות",
+    "analytics": "סקירת ניתוחים",
+    "management_centers": "מרכזי ניהול"
   },
   "nav": {
     "dashboard": "לוח בקרה",
