@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -14,6 +17,7 @@
     "@supabase/supabase-js": "^2.108.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.5.0",
     "next": "16.2.9",
     "next-intl": "^4.13.0",
     "react": "19.2.4",
@@ -24,13 +28,19 @@
   "devDependencies": {
     "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/user-event": "^14.5.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/ui": "^1.6.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "happy-dom": "^12.10.3",
     "playwright": "^1.61.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.1"
   }
 }
