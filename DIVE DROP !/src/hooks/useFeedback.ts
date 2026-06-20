@@ -1,67 +1,78 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import type { FeedbackFormData } from '@/types/feedback';
+import { feedbackInsertSchema } from '@/lib/feedback/validation';
+import type { FeedbackInsertInput } from '@/lib/feedback/validation';
+import { ZodError } from 'zod';
 
-interface UseFeedbackReturn {
-  loading: boolean;
-  error: string | null;
-  submitFeedback: (
-    diveSiteId: string,
-    diveBookingId: string,
-    userId: string,
-    data: FeedbackFormData
-  ) => Promise<void>;
-}
-
-export function useFeedback(): UseFeedbackReturn {
-  const [loading, setLoading] = useState(false);
+/**
+ * useFeedback Hook
+ *
+ * Manages feedback submission to the API with validation and error handling.
+ *
+ * @returns {Object} Hook return object with submitFeedback, isLoading, and error
+ */
+export function useFeedback() {
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submitFeedback = async (
-    diveSiteId: string,
-    diveBookingId: string,
-    userId: string,
-    data: FeedbackFormData
-  ) => {
-    setLoading(true);
+  /**
+   * Submit feedback to the API
+   *
+   * @param data - FeedbackInsertInput data to submit
+   * @returns Promise<boolean> - true on success, false on validation error
+   * @throws Error on network or API errors
+   */
+  const submitFeedback = async (data: FeedbackInsertInput): Promise<boolean> => {
+    setIsLoading(true);
     setError(null);
 
     try {
-      const supabase = createClient();
+      // Validate data against schema
+      const validatedData = feedbackInsertSchema.parse(data);
 
-      // Insert feedback into database
-      const { error: dbError } = await supabase.from('feedback').insert({
-        dive_site_id: diveSiteId,
-        dive_booking_id: diveBookingId,
-        diver_id: userId,
-        visibility_meters: data.visibility_meters,
-        temperature_celsius: data.temperature_celsius,
-        current_strength: data.current_strength,
-        marine_life: data.marine_life,
-        marine_life_custom: data.marine_life_custom,
-        notes: data.notes,
-        image_urls: data.image_urls,
-        submitted_at: new Date().toISOString(),
+      // POST to API endpoint
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(validatedData),
       });
 
-      if (dbError) {
-        throw new Error(dbError.message || 'Failed to submit feedback');
+      // Handle API errors
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const apiError = errorData.message || `API error: ${response.status}`;
+        throw new Error(apiError);
       }
+
+      // Success - clear any existing errors
+      setError(null);
+      return true;
     } catch (err) {
+      // Handle validation errors
+      if (err instanceof ZodError) {
+        const validationMessage = err.errors
+          .map((e) => `${e.path.join('.')}: ${e.message}`)
+          .join('; ');
+        setError(`Validation error: ${validationMessage}`);
+        return false;
+      }
+
+      // Handle other errors
       const message =
         err instanceof Error ? err.message : 'An error occurred while submitting feedback';
       setError(message);
       throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return {
-    loading,
-    error,
     submitFeedback,
+    isLoading,
+    error,
   };
 }
