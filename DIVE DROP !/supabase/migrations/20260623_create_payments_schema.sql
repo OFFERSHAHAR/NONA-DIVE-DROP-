@@ -16,84 +16,16 @@ CREATE TYPE transaction_type AS ENUM ('charge', 'payout', 'refund', 'fee');
 CREATE TYPE transaction_entity AS ENUM ('diver', 'service_provider', 'dive_drop');
 
 -- ============================================================================
--- SERVICE PROVIDER ACCOUNTS (Stripe Connect)
+-- SERVICE PROVIDERS
 -- ============================================================================
-
-CREATE TABLE service_provider_accounts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
-
-  -- Stripe Connect
-  stripe_account_id VARCHAR(255) NOT NULL UNIQUE,
-  stripe_onboarding_complete BOOLEAN DEFAULT FALSE,
-  stripe_onboarding_error TEXT,
-
-  -- Business Information
-  business_name TEXT,
-  business_type VARCHAR(50), -- 'individual', 'company', 'boat_operator', 'dive_school'
-  business_tax_id TEXT, -- חברה מספר / Tax ID
-  business_phone TEXT,
-  business_address TEXT,
-  business_website TEXT,
-
-  -- Payout Configuration
-  payout_schedule VARCHAR(50) DEFAULT 'daily', -- 'daily', 'weekly', 'monthly'
-  payout_currency VARCHAR(3) DEFAULT 'ILS',
-  minimum_payout_amount_cents BIGINT DEFAULT 1000, -- ₪10
-
-  -- Status
-  is_active BOOLEAN DEFAULT TRUE,
-  verified_at TIMESTAMP WITH TIME ZONE,
-
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-
-  CONSTRAINT valid_business_type CHECK (business_type IN ('individual', 'company', 'boat_operator', 'dive_school')),
-  CONSTRAINT valid_payout_schedule CHECK (payout_schedule IN ('daily', 'weekly', 'monthly'))
-);
+-- NOTE: service_providers table is created in 20260625_booking_system_schema.sql
+-- This migration depends on that table and only creates payment-related tables
+-- that reference it.
 
 -- ============================================================================
--- DIVE BOOKINGS
+-- NOTE: Booking table is created in 20260625_booking_system_schema.sql
+-- This migration references the bookings table from that schema
 -- ============================================================================
-
-CREATE TABLE dive_bookings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-
-  -- Parties
-  diver_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT,
-  service_provider_id UUID NOT NULL REFERENCES service_provider_accounts(id) ON DELETE RESTRICT,
-  buddy_connection_id UUID REFERENCES buddy_connections(id) ON DELETE SET NULL,
-
-  -- Dive Details
-  dive_site_id UUID REFERENCES dive_sites(id) ON DELETE SET NULL,
-  dive_date TIMESTAMP WITH TIME ZONE NOT NULL,
-  dive_duration_minutes INT,
-  number_of_divers INT NOT NULL DEFAULT 1,
-  experience_level diving_level,
-
-  -- Special Requests
-  notes TEXT,
-
-  -- Pricing
-  amount_cents BIGINT NOT NULL, -- 50000 = ₪500
-  currency VARCHAR(3) DEFAULT 'ILS',
-
-  -- Booking Status
-  status booking_status NOT NULL DEFAULT 'pending',
-  cancellation_reason TEXT,
-  cancelled_at TIMESTAMP WITH TIME ZONE,
-
-  -- Stripe Payment
-  stripe_payment_intent_id VARCHAR(255),
-  stripe_transaction_id VARCHAR(255),
-
-  -- Timestamps
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-
-  CONSTRAINT valid_amount CHECK (amount_cents > 0),
-  CONSTRAINT valid_duration CHECK (dive_duration_minutes IS NULL OR dive_duration_minutes > 0)
-);
 
 -- ============================================================================
 -- COMMISSION RECORDS
@@ -103,8 +35,8 @@ CREATE TABLE commission_records (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
   -- Link to booking
-  booking_id UUID NOT NULL UNIQUE REFERENCES dive_bookings(id) ON DELETE CASCADE,
-  service_provider_id UUID NOT NULL REFERENCES service_provider_accounts(id) ON DELETE RESTRICT,
+  booking_id UUID NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
+  service_provider_id UUID NOT NULL REFERENCES service_providers(id) ON DELETE RESTRICT,
 
   -- Commission Calculation
   gross_amount_cents BIGINT NOT NULL, -- ₪500 = 50000
@@ -143,7 +75,7 @@ CREATE TABLE invoices (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
   -- Link to booking
-  booking_id UUID NOT NULL REFERENCES dive_bookings(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
 
   -- Invoice recipient
   recipient_id UUID NOT NULL REFERENCES auth.users(id),
@@ -218,7 +150,7 @@ CREATE TABLE refunds (
 
   -- Links
   commission_record_id UUID NOT NULL REFERENCES commission_records(id) ON DELETE CASCADE,
-  booking_id UUID NOT NULL REFERENCES dive_bookings(id) ON DELETE CASCADE,
+  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
 
   -- Refund Details
   refund_amount_cents BIGINT NOT NULL,
@@ -247,7 +179,7 @@ CREATE TABLE payment_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
   -- Link to booking (optional)
-  booking_id UUID REFERENCES dive_bookings(id) ON DELETE SET NULL,
+  booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
 
   -- Transaction Details
   type transaction_type NOT NULL,
@@ -285,7 +217,7 @@ CREATE TABLE payment_transactions (
 CREATE TABLE payment_disputes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
-  booking_id UUID NOT NULL REFERENCES dive_bookings(id),
+  booking_id UUID NOT NULL REFERENCES bookings(id),
 
   -- Dispute Details
   type VARCHAR(50), -- 'chargeback', 'complaint', 'refund_dispute'
@@ -314,18 +246,11 @@ CREATE TABLE payment_disputes (
 -- INDEXES
 -- ============================================================================
 
--- Service Provider Accounts
-CREATE INDEX idx_service_provider_accounts_user_id ON service_provider_accounts(user_id);
-CREATE INDEX idx_service_provider_accounts_stripe ON service_provider_accounts(stripe_account_id);
-CREATE INDEX idx_service_provider_accounts_is_active ON service_provider_accounts(is_active);
+-- Service Providers
+-- Indexes already created in 20260625_booking_system_schema.sql
 
--- Dive Bookings
-CREATE INDEX idx_dive_bookings_diver_id ON dive_bookings(diver_id);
-CREATE INDEX idx_dive_bookings_service_provider_id ON dive_bookings(service_provider_id);
-CREATE INDEX idx_dive_bookings_status ON dive_bookings(status);
-CREATE INDEX idx_dive_bookings_dive_date ON dive_bookings(dive_date DESC);
-CREATE INDEX idx_dive_bookings_created_at ON dive_bookings(created_at DESC);
-CREATE INDEX idx_dive_bookings_stripe_intent ON dive_bookings(stripe_payment_intent_id);
+-- Bookings
+-- Indexes already created in 20260625_booking_system_schema.sql
 
 -- Commission Records
 CREATE INDEX idx_commission_records_booking_id ON commission_records(booking_id);
@@ -367,8 +292,7 @@ CREATE INDEX idx_payment_disputes_stripe_id ON payment_disputes(stripe_dispute_i
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================================================
 
-ALTER TABLE service_provider_accounts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE dive_bookings ENABLE ROW LEVEL SECURITY;
+-- RLS already enabled on service_providers and bookings in 20260625_booking_system_schema.sql
 ALTER TABLE commission_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
@@ -376,45 +300,15 @@ ALTER TABLE refunds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_disputes ENABLE ROW LEVEL SECURITY;
 
--- Service Provider Accounts
-CREATE POLICY "Users can view their own provider account"
-  ON service_provider_accounts
-  FOR SELECT
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Users can update their own provider account"
-  ON service_provider_accounts
-  FOR UPDATE
-  USING (user_id = auth.uid());
-
--- Dive Bookings
-CREATE POLICY "Users can view their own bookings"
-  ON dive_bookings
-  FOR SELECT
-  USING (
-    diver_id = auth.uid()
-    OR service_provider_id IN (SELECT id FROM service_provider_accounts WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "Authenticated users can create bookings"
-  ON dive_bookings
-  FOR INSERT
-  WITH CHECK (diver_id = auth.uid());
-
-CREATE POLICY "Users can update their own bookings"
-  ON dive_bookings
-  FOR UPDATE
-  USING (
-    diver_id = auth.uid()
-    OR service_provider_id IN (SELECT id FROM service_provider_accounts WHERE user_id = auth.uid())
-  );
+-- RLS Policies for service_providers and bookings are defined in 20260625_booking_system_schema.sql
+-- This migration only adds RLS for payment-related tables
 
 -- Commission Records
 CREATE POLICY "Service providers can view their commissions"
   ON commission_records
   FOR SELECT
   USING (
-    service_provider_id IN (SELECT id FROM service_provider_accounts WHERE user_id = auth.uid())
+    service_provider_id IN (SELECT id FROM service_providers WHERE user_id = auth.uid())
   );
 
 -- Invoices
@@ -445,9 +339,9 @@ CREATE POLICY "Users can view related refunds"
   FOR SELECT
   USING (
     booking_id IN (
-      SELECT id FROM dive_bookings
+      SELECT id FROM bookings
       WHERE diver_id = auth.uid()
-        OR service_provider_id IN (SELECT id FROM service_provider_accounts WHERE user_id = auth.uid())
+        OR service_provider_id IN (SELECT id FROM service_providers WHERE user_id = auth.uid())
     )
   );
 
@@ -459,9 +353,9 @@ CREATE POLICY "Users can view related transactions"
     from_user_id = auth.uid()
     OR to_user_id = auth.uid()
     OR booking_id IN (
-      SELECT id FROM dive_bookings
+      SELECT id FROM bookings
       WHERE diver_id = auth.uid()
-        OR service_provider_id IN (SELECT id FROM service_provider_accounts WHERE user_id = auth.uid())
+        OR service_provider_id IN (SELECT id FROM service_providers WHERE user_id = auth.uid())
     )
   );
 
@@ -471,9 +365,9 @@ CREATE POLICY "Users can view related disputes"
   FOR SELECT
   USING (
     booking_id IN (
-      SELECT id FROM dive_bookings
+      SELECT id FROM bookings
       WHERE diver_id = auth.uid()
-        OR service_provider_id IN (SELECT id FROM service_provider_accounts WHERE user_id = auth.uid())
+        OR service_provider_id IN (SELECT id FROM service_providers WHERE user_id = auth.uid())
     )
   );
 
@@ -490,15 +384,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_service_provider_accounts_timestamp
-BEFORE UPDATE ON service_provider_accounts
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp_payments();
-
-CREATE TRIGGER trigger_update_dive_bookings_timestamp
-BEFORE UPDATE ON dive_bookings
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp_payments();
+-- Triggers for service_providers and bookings are defined in 20260625_booking_system_schema.sql
 
 CREATE TRIGGER trigger_update_commission_records_timestamp
 BEFORE UPDATE ON commission_records
