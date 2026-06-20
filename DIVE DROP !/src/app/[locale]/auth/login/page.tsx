@@ -21,6 +21,10 @@ export default function LoginPage() {
   const locale = params.locale as string;
   const searchParams = useSearchParams();
   const registered = searchParams.get('registered') === 'true';
+  const requestedDestination = searchParams.get('next');
+  const destination = requestedDestination?.startsWith(`/${locale}/`)
+    ? requestedDestination
+    : `/${locale}/dashboard`;
 
   const [errors, setErrors] = useState<Partial<Record<keyof LoginInput, string>>>({});
   const [globalError, setGlobalError] = useState('');
@@ -57,7 +61,7 @@ export default function LoginPage() {
       if (result.error) {
         setGlobalError(result.error);
       } else if (result.success) {
-        router.push(`/${locale}/dashboard`);
+        router.push(destination);
       }
     } catch (error) {
       if (error instanceof ZodError) {
@@ -134,7 +138,7 @@ export default function LoginPage() {
           </div>
           <div className="text-center">
             <span className="text-text-secondary">{t('no_account')} </span>
-            <Link href={`/${locale}/auth/register`} className="text-primary font-semibold hover:underline">
+            <Link href={`/${locale}/auth/register${requestedDestination ? `?next=${encodeURIComponent(destination)}` : ''}`} className="text-primary font-semibold hover:underline">
               {t('register_link')}
             </Link>
           </div>

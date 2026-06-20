@@ -25,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isRTL = locale === 'he';
   const isHome = pathname === `/${locale}`;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const navigationItems = [
     { href: `/${locale}`, icon: 'home' as AppIconName, label: isRTL ? 'דף הבית' : 'Home' },
     { href: `/${locale}/explore`, icon: 'search' as AppIconName, label: isRTL ? 'גילוי אתרי צלילה' : 'Explore' },
@@ -73,19 +74,30 @@ export const Header: React.FC<HeaderProps> = ({
           </Link>
 
           {/* Right: Notification Bell */}
-          <button
-            aria-label={isRTL ? 'התראות' : 'Notifications'}
-            className={clsx('relative rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
-          >
-            <AppIcon name="bell" className={clsx('h-7 w-7', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')} />
-
-            {/* Notification Badge */}
-            {showNotificationBadge && notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[24px] h-6 px-1 bg-error text-white text-xs font-bold rounded-full">
-                {notificationCount > 99 ? '99+' : notificationCount}
-              </span>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsNotificationsOpen((open) => !open)}
+              aria-label={isRTL ? 'התראות' : 'Notifications'}
+              aria-expanded={isNotificationsOpen}
+              className={clsx('relative rounded-lg p-2 transition-colors', isHome ? 'text-white hover:bg-white/15' : 'hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated')}
+            >
+              <AppIcon name="bell" className={clsx('h-7 w-7', isHome ? 'text-white' : 'text-text-primary dark:text-text-light')} />
+              {showNotificationBadge && notificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex min-w-[24px] h-6 items-center justify-center rounded-full bg-error px-1 text-xs font-bold text-white">
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+              )}
+            </button>
+            {isNotificationsOpen && (
+              <div dir={isRTL ? 'rtl' : 'ltr'} className="absolute right-0 top-12 z-[70] w-[min(88vw,320px)] overflow-hidden rounded-2xl border border-blue-100 bg-white text-[#10264b] shadow-2xl">
+                <div className="border-b border-blue-100 px-4 py-3 font-bold">{isRTL ? 'התראות' : 'Notifications'}</div>
+                <Link href={`/${locale}/my-dives`} onClick={() => setIsNotificationsOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-blue-50"><AppIcon name="calendar" className="mt-0.5 h-5 w-5 text-blue-600" /><span>{isRTL ? 'בדוק את הצלילות וההזמנות הקרובות' : 'Review your upcoming dives'}</span></Link>
+                <Link href={`/${locale}/explore`} onClick={() => setIsNotificationsOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-blue-50"><AppIcon name="star" className="mt-0.5 h-5 w-5 text-blue-600" /><span>{isRTL ? 'נוספו אתרי צלילה מומלצים' : 'New recommended dive sites'}</span></Link>
+                <Link href={`/${locale}/profile`} onClick={() => setIsNotificationsOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-blue-50"><AppIcon name="user" className="mt-0.5 h-5 w-5 text-blue-600" /><span>{isRTL ? 'השלם את פרטי פרופיל הצלילה' : 'Complete your diving profile'}</span></Link>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </header>
 

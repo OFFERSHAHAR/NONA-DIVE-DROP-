@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
-import { Button } from '@/components/Button';
 import { Card, CardBody } from '@/components/Card';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
 import { createClient } from '@/lib/supabase/server';
@@ -25,11 +24,44 @@ async function getAllDiveSites(): Promise<DiveSite[]> {
   }
 }
 
-export default async function ExplorePage() {
+type ExploreSearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function ExplorePage({ searchParams }: { searchParams: ExploreSearchParams }) {
   const locale = await getLocale();
   const t = await getTranslations('explore');
-  const diveSites = await getAllDiveSites();
+  const allDiveSites = await getAllDiveSites();
+  const query = await searchParams;
+  const search = typeof query.q === 'string' ? query.q.trim().toLowerCase() : '';
+  const difficulty = typeof query.difficulty === 'string' ? query.difficulty : '';
+  const selectedSite = typeof query.site === 'string' ? query.site : '';
+  const category = typeof query.category === 'string' ? query.category : '';
+  const searchType = typeof query.type === 'string' ? query.type : '';
+  const selectedDate = typeof query.date === 'string' ? query.date : '';
+  const selectedLevel = typeof query.level === 'string' ? query.level : '';
+  const diveSites = allDiveSites.filter((site) => {
+    const matchesSearch = !search || site.name.toLowerCase().includes(search) || (site.location || '').toLowerCase().includes(search);
+    const matchesDifficulty = !difficulty || site.difficulty === difficulty;
+    const matchesSite = !selectedSite || site.id === selectedSite;
+    return matchesSearch && matchesDifficulty && matchesSite;
+  });
   const isRTL = locale === 'he';
+  const categoryTitles: Record<string, { he: string; en: string }> = {
+    clubs: { he: 'מועדוני צלילה', en: 'Dive Clubs' },
+    instructors: { he: 'מדריכי צלילה', en: 'Dive Instructors' },
+    pickups: { he: 'הסעות לצלילות', en: 'Dive Pickups' },
+    boat: { he: 'צלילות סירה', en: 'Boat Dives' },
+  };
+  const typeTitles: Record<string, { he: string; en: string }> = {
+    dive: { he: 'חיפוש צלילה', en: 'Find a Dive' },
+    site: { he: 'אתרי צלילה', en: 'Dive Sites' },
+    boat: { he: 'קבוצות וצלילות סירה', en: 'Boat Dive Groups' },
+  };
+  const activeTitle = categoryTitles[category] || typeTitles[searchType];
+  const pageTitle = activeTitle ? (isRTL ? activeTitle.he : activeTitle.en) : (isRTL ? 'אתרי צלילה' : 'Dive Sites');
+  const activeCriteria = [
+    selectedDate && `${isRTL ? 'תאריך' : 'Date'}: ${selectedDate}`,
+    selectedLevel && `${isRTL ? 'דרגה' : 'Level'}: ${selectedLevel}`,
+  ].filter(Boolean);
 
   return (
     <div className={`min-h-screen w-full bg-[#f6f9fd] dark:bg-dark-bg ${isRTL ? 'rtl' : 'ltr'}`}>
@@ -46,7 +78,7 @@ export default async function ExplorePage() {
                 <AppIcon name={isRTL ? 'arrow-right' : 'arrow-left'} className="h-6 w-6 text-text-primary dark:text-text-light" />
               </Link>
               <h1 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-text-light">
-                {isRTL ? 'אתרי צלילה' : 'Dive Sites'}
+                {pageTitle}
               </h1>
             </div>
             <p className="text-text-secondary dark:text-text-secondary-light">
@@ -55,44 +87,57 @@ export default async function ExplorePage() {
           </div>
 
           {/* Settings Icon */}
-          <button
+          <Link
+            href={`/${locale}/settings`}
             aria-label={isRTL ? 'הגדרות' : 'Settings'}
             className="p-2 hover:bg-bg-secondary dark:hover:bg-dark-surface-elevated rounded-lg transition-colors flex-shrink-0"
           >
             <AppIcon name="settings" className="h-6 w-6 text-text-primary dark:text-text-light" />
-          </button>
+          </Link>
         </div>
 
         {/* Search Input */}
-        <div className="mb-5 rounded-2xl bg-white p-2 shadow-sm">
+        <form action={`/${locale}/explore`} method="get" className="mb-5 rounded-2xl bg-white p-2 shadow-sm">
           <div className="relative">
             <AppIcon name="search" className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary dark:text-text-secondary-light" />
             <input
+              name="q"
               type="text"
+              defaultValue={search}
               placeholder={t('search_placeholder')}
-              className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-text-primary shadow-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-24 text-text-primary shadow-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
+            <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white">{isRTL ? 'חפש' : 'Search'}</button>
           </div>
-        </div>
+        </form>
+
+        {activeCriteria.length > 0 && (
+          <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">
+            <AppIcon name="info" className="h-5 w-5 text-blue-600" />
+            {activeCriteria.map((criterion) => <span key={criterion} className="rounded-full bg-white px-3 py-1">{criterion}</span>)}
+            <Link href={`/${locale}/explore`} className="underline">{isRTL ? 'נקה חיפוש' : 'Clear search'}</Link>
+          </div>
+        )}
 
         {/* Filter Chips */}
         <div className={`flex flex-wrap gap-2 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {[
-            { id: 'all', label: t('all'), icon: 'grid' as AppIconName },
-            { id: 'type', label: t('filter_difficulty'), icon: 'filter' as AppIconName },
-            { id: 'level', label: isRTL ? 'דרגת צולל' : 'Diver Level', icon: 'level' as AppIconName },
-            { id: 'more', label: isRTL ? 'עוד' : 'More', icon: 'settings' as AppIconName },
+            { id: '', label: t('all'), icon: 'grid' as AppIconName },
+            { id: 'easy', label: isRTL ? 'קל' : 'Easy', icon: 'level' as AppIconName },
+            { id: 'intermediate', label: isRTL ? 'בינוני' : 'Intermediate', icon: 'filter' as AppIconName },
+            { id: 'hard', label: isRTL ? 'מאתגר' : 'Advanced', icon: 'award' as AppIconName },
           ].map((filter) => (
-            <button
+            <Link
               key={filter.id}
+              href={`/${locale}/explore${filter.id ? `?difficulty=${filter.id}` : ''}`}
               className={`px-4 py-2 rounded-full border-2 transition-all font-semibold text-sm ${
-                filter.id === 'all'
+                filter.id === difficulty
                   ? 'border-primary bg-primary text-white dark:border-cyan-accent dark:bg-cyan-accent dark:text-dark-bg'
                   : 'border-border-primary dark:border-border-dark bg-white dark:bg-dark-surface text-text-primary dark:text-text-light hover:border-primary dark:hover:border-cyan-accent'
               }`}
             >
               <span className="flex items-center gap-2"><AppIcon name={filter.icon} className="h-4 w-4" />{filter.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -185,15 +230,12 @@ function DiveSiteCardExplore({ site, locale, isRTL }: DiveSiteCardExploreProps) 
 
         {/* Action Buttons */}
         <div className={`flex gap-2 pt-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <Button className="flex-1 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg py-2">
+          <Link href={`/${locale}/my-dives?site=${site.id}`} className="flex flex-1 items-center justify-center rounded-lg bg-primary py-2 font-semibold text-white hover:bg-primary-dark">
             {isRTL ? 'בחר' : 'Select'}
-          </Button>
-          <Button
-            variant="secondary"
-            className="flex-1 border border-primary dark:border-cyan-accent text-primary dark:text-cyan-accent hover:bg-primary/10 dark:hover:bg-cyan-accent/10 font-semibold rounded-lg py-2"
-          >
+          </Link>
+          <Link href={`/${locale}/explore/${site.id}`} className="flex flex-1 items-center justify-center rounded-lg border border-primary py-2 font-semibold text-primary hover:bg-primary/10 dark:border-cyan-accent dark:text-cyan-accent dark:hover:bg-cyan-accent/10">
             {isRTL ? 'פרטים' : 'Details'}
-          </Button>
+          </Link>
         </div>
       </CardBody>
     </Card>

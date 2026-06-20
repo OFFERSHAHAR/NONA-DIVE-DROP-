@@ -85,11 +85,12 @@ export default async function HomePage() {
                 <article key={site.id} className="w-[230px] flex-none snap-start overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_8px_22px_rgba(17,63,105,.12)] sm:w-[260px] lg:w-auto lg:min-w-0 lg:flex-1">
                   <div className="relative h-40 overflow-hidden">
                     <img src={site.image} alt={site.name} className="h-full w-full object-cover transition duration-300 hover:scale-105" />
-                    <span className={`absolute left-3 top-3 flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold text-white ${recommendedBadges[index].color}`}><AppIcon name={recommendedBadges[index].icon} className="h-3.5 w-3.5" />{recommendedBadges[index].label}</span>
-                    <AppIcon name="heart" className="absolute right-3 top-3 h-8 w-8 text-white drop-shadow" />
+                    <Link href={`/${locale}/explore/${site.id}`} aria-label={`${isRTL ? 'פרטים על' : 'Details for'} ${site.name}`} className="absolute inset-0 z-[1]" />
+                    <span className={`pointer-events-none absolute left-3 top-3 z-[2] flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold text-white ${recommendedBadges[index].color}`}><AppIcon name={recommendedBadges[index].icon} className="h-3.5 w-3.5" />{recommendedBadges[index].label}</span>
+                    <Link href={`/${locale}/auth/login?next=/${locale}/explore/${site.id}`} aria-label={isRTL ? 'הוסף למועדפים' : 'Add to favorites'} className="absolute right-3 top-3 z-[3] rounded-full p-1 text-white drop-shadow hover:bg-white/15"><AppIcon name="heart" className="h-8 w-8" /></Link>
                   </div>
                   <div className="space-y-2 p-4">
-                    <h3 className="text-lg font-extrabold leading-6">{site.name}</h3>
+                    <Link href={`/${locale}/explore/${site.id}`} className="block hover:text-blue-700"><h3 className="text-lg font-extrabold leading-6">{site.name}</h3></Link>
                     <p className="text-sm text-slate-600">{isRTL ? 'עומק מקסימלי' : 'Max depth'}: {site.depth || 18} מ׳</p>
                     <div className="flex items-center justify-between text-sm text-slate-500"><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-emerald-500" />{isRTL ? 'קל' : 'Easy'}</span><span className="flex items-center gap-1.5"><AppIcon name="van" className="h-4 w-4" />{isRTL ? 'מהמרכז' : 'Pickup'}</span></div>
                   </div>
@@ -108,14 +109,14 @@ export default async function HomePage() {
             <h2 className="text-center !text-2xl !leading-8 font-extrabold">{isRTL ? 'חיפוש צלילה' : 'Find a dive'}</h2>
             <div className="mx-auto my-2 h-1 w-9 rounded-full bg-cyan-400" />
             <div className="grid grid-cols-3 gap-3 py-3">
-              {(['users', 'coral', 'boat'] as AppIconName[]).map((icon, index) => <button key={icon} className={`flex min-h-20 flex-col items-center justify-center rounded-2xl border border-slate-100 font-bold ${index === 1 ? 'bg-gradient-to-b from-cyan-500 to-blue-700 text-white' : 'bg-slate-50 text-[#17345e]'}`}><AppIcon name={icon} className="h-6 w-6" /><span className="mt-1 block">{[isRTL ? 'צלילה' : 'Dive', isRTL ? 'אתר צלילה' : 'Dive site', isRTL ? 'קבוצת סירה' : 'Boat group'][index]}</span></button>)}
+              {(['users', 'coral', 'boat'] as AppIconName[]).map((icon, index) => <Link key={icon} href={`/${locale}/explore?type=${['dive', 'site', 'boat'][index]}`} className={`flex min-h-20 flex-col items-center justify-center rounded-2xl border border-slate-100 font-bold ${index === 1 ? 'bg-gradient-to-b from-cyan-500 to-blue-700 text-white' : 'bg-slate-50 text-[#17345e]'}`}><AppIcon name={icon} className="h-6 w-6" /><span className="mt-1 block">{[isRTL ? 'צלילה' : 'Dive', isRTL ? 'אתר צלילה' : 'Dive site', isRTL ? 'קבוצת סירה' : 'Boat group'][index]}</span></Link>)}
             </div>
-            <div className="space-y-3">
-              <select aria-label="בחר אתר צלילה" className="rounded-xl border-slate-200 bg-white"><option>{isRTL ? 'בחר אתר צלילה' : 'Choose a dive site'}</option>{sites.map(site => <option key={site.id}>{site.name}</option>)}</select>
-              <input aria-label="בחר תאריך" type="date" className="rounded-xl border-slate-200 bg-white" />
-              <select aria-label="דרגת צולל" className="rounded-xl border-slate-200 bg-white"><option>Advanced Open Water</option><option>Rescue Diver</option><option>Divemaster</option></select>
-              <Link href={`/${locale}/explore`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-blue-700 to-cyan-500 font-bold text-white shadow-lg"><AppIcon name="search" className="h-5 w-5" />{isRTL ? 'חפש' : 'Search'}</Link>
-            </div>
+            <form action={`/${locale}/explore`} method="get" className="space-y-3">
+              <select name="site" aria-label="בחר אתר צלילה" className="rounded-xl border-slate-200 bg-white"><option value="">{isRTL ? 'בחר אתר צלילה' : 'Choose a dive site'}</option>{sites.map(site => <option key={site.id} value={site.id}>{site.name}</option>)}</select>
+              <input name="date" aria-label="בחר תאריך" type="date" className="rounded-xl border-slate-200 bg-white" />
+              <select name="level" aria-label="דרגת צולל" className="rounded-xl border-slate-200 bg-white"><option value="advanced">Advanced Open Water</option><option value="rescue">Rescue Diver</option><option value="divemaster">Divemaster</option></select>
+              <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-blue-700 to-cyan-500 font-bold text-white shadow-lg"><AppIcon name="search" className="h-5 w-5" />{isRTL ? 'חפש' : 'Search'}</button>
+            </form>
           </section>
 
           <section className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">

@@ -20,14 +20,19 @@ interface DiveRecord {
   updated_at: string;
 }
 
-export default async function MyDivesPage() {
+type MyDivesSearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function MyDivesPage({ searchParams }: { searchParams: MyDivesSearchParams }) {
   const locale = await getLocale();
   const t = await getTranslations('my_dives');
   const user = await getCurrentUser();
+  const query = await searchParams;
+  const selectedSite = typeof query.site === 'string' ? query.site : '';
 
   // Redirect to login if not authenticated
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    const destination = `/${locale}/my-dives${selectedSite ? `?site=${encodeURIComponent(selectedSite)}` : ''}`;
+    redirect(`/${locale}/auth/login?next=${encodeURIComponent(destination)}`);
   }
 
   const supabase = await createClient();
