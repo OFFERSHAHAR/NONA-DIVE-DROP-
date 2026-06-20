@@ -6,7 +6,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { createClient } from '@/lib/supabase/client';
 import type {
   FreedivingInstructor,
   FreedivingInstructorInsert,
@@ -66,7 +66,7 @@ export function useInstructorDirectory(options?: {
   min_rating?: number;
   limit?: number;
 }) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [instructors, setInstructors] = useState<InstructorDirectory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +96,7 @@ export function useInstructorDirectory(options?: {
  * Hook to fetch single instructor profile
  */
 export function useInstructor(instructorId: string | null) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [instructor, setInstructor] = useState<FreedivingInstructor | null>(null);
   const [loading, setLoading] = useState(!!instructorId);
   const [error, setError] = useState<string | null>(null);
@@ -132,7 +132,7 @@ export function useInstructor(instructorId: string | null) {
  * Hook to fetch instructor statistics
  */
 export function useInstructorStats(instructorId: string | null) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(!!instructorId);
   const [error, setError] = useState<string | null>(null);
@@ -168,7 +168,7 @@ export function useInstructorStats(instructorId: string | null) {
  * Hook to validate instructor credentials and insurance
  */
 export function useInstructorValidation(instructorId: string | null) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [validation, setValidation] = useState<any>(null);
   const [loading, setLoading] = useState(!!instructorId);
   const [error, setError] = useState<string | null>(null);
@@ -200,7 +200,7 @@ export function useInstructorValidation(instructorId: string | null) {
  * Hook to manage instructor profile
  */
 export function useInstructorProfile(instructorId: string | null) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const { instructor, loading, error } = useInstructor(instructorId);
 
   const updateProfile = useCallback(
@@ -223,7 +223,7 @@ export function useInstructorProfile(instructorId: string | null) {
  * Hook to fetch services by instructor
  */
 export function useInstructorServices(instructorId: string | null) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [services, setServices] = useState<FreedivingService[]>([]);
   const [loading, setLoading] = useState(!!instructorId);
   const [error, setError] = useState<string | null>(null);
@@ -264,7 +264,7 @@ export function useServiceSearch(options?: {
   max_price?: number;
   limit?: number;
 }) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [services, setServices] = useState<FreedivingService[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -302,7 +302,7 @@ export function useBuddyListings(options?: {
   experience_level?: FreedivingLevel;
   limit?: number;
 }) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [listings, setListings] = useState<FreedivingBuddyListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -332,8 +332,16 @@ export function useBuddyListings(options?: {
  * Hook to create buddy listing
  */
 export function useCreateBuddyListing() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const supabase = createClient();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    };
+    getUser();
+  }, [supabase]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -370,8 +378,16 @@ export function useCreateBuddyListing() {
  * Hook to fetch user bookings
  */
 export function useUserBookings() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const supabase = createClient();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    };
+    getUser();
+  }, [supabase]);
   const [bookings, setBookings] = useState<FreedivingBooking[]>([]);
   const [loading, setLoading] = useState(!!user);
   const [error, setError] = useState<string | null>(null);
@@ -410,7 +426,7 @@ export function useInstructorBookings(
   instructorId: string | null,
   status?: FreedivingBooking['status']
 ) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [bookings, setBookings] = useState<FreedivingBooking[]>([]);
   const [loading, setLoading] = useState(!!instructorId);
   const [error, setError] = useState<string | null>(null);
@@ -446,8 +462,16 @@ export function useInstructorBookings(
  * Hook to check availability and create booking
  */
 export function useCreateBooking() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const supabase = createClient();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    };
+    getUser();
+  }, [supabase]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -508,7 +532,7 @@ export function useUpcomingSessions(options?: {
   location?: string;
   limit?: number;
 }) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [sessions, setSessions] = useState<FreedivingSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -542,7 +566,7 @@ export function useUpcomingSessions(options?: {
  * Hook to fetch instructor reviews
  */
 export function useInstructorReviews(instructorId: string | null) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [reviews, setReviews] = useState<FreedivingReview[]>([]);
   const [loading, setLoading] = useState(!!instructorId);
   const [error, setError] = useState<string | null>(null);
@@ -578,8 +602,16 @@ export function useInstructorReviews(instructorId: string | null) {
  * Hook to create review
  */
 export function useCreateReview() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const supabase = createClient();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+    };
+    getUser();
+  }, [supabase]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -616,7 +648,7 @@ export function useCreateReview() {
  * Hook to add instructor credential
  */
 export function useAddCredential() {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -644,7 +676,7 @@ export function useAddCredential() {
  * Hook to add instructor insurance
  */
 export function useAddInsurance() {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

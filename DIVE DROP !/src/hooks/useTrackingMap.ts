@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { createClient } from '@/lib/supabase/client';
 import type {
   ShuttleLocation,
   TrackingSession,
@@ -30,7 +30,7 @@ export function useTrackingMap({
   onStatusChange,
   onError,
 }: UseTrackingMapOptions) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const [trip, setTrip] = useState<DiveTrip | null>(null);
   const [shuttle, setShuttle] = useState<Shuttle | null>(null);
   const [userLocation, setUserLocation] = useState<GeolocationCoordinates | null>(null);

@@ -14,7 +14,7 @@ import { logger } from '@/utils/logger';
  * {
  *   "crons": [{
  *     "path": "/api/cron/rotate-photos",
- *     "schedule": "0 0 */3 * * *"  // Every 3 days at midnight UTC
+ *     "schedule": "0 0 0 * * 3"  // Every 3 days at midnight UTC
  *   }]
  * }
  *

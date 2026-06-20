@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { LiveTrackingContainer } from '@/components/tracking';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -12,7 +12,21 @@ interface TrackingPageProps {
 }
 
 async function verifyTripAccess(tripId: string, userId?: string) {
-  const supabase = createServerComponentClient({ cookies });
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: (cookiesToSet: any) => {
+          cookiesToSet.forEach(({ name, value, options }: any) =>
+            cookieStore.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 
   const { data, error } = await supabase
     .from('dive_trips')

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { createClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import type { DriverLocationUpdate } from '@/types/shuttle';
 
@@ -27,7 +27,7 @@ export function DriverLocationShare({
   onLocationUpdate,
   onError,
 }: DriverLocationShareProps) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const t = useTranslations('tracking');
   const [isTracking, setIsTracking] = useState(false);
   const [lastLocation, setLastLocation] = useState<DriverLocationUpdate | null>(null);

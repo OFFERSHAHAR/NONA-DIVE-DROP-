@@ -5,7 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAdminStore } from '@/lib/stores/adminStore';
 import AdminNavigation from './components/AdminNavigation';
-import { Loader } from '@/components/Loader';
+
+function Loader() {
+  return (
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+  );
+}
+
+export { Loader };
 
 export default function AdminLayout({
   children,
@@ -54,11 +61,5 @@ export default function AdminLayout({
         {children}
       </main>
     </div>
-  );
-}
-
-export function Loader() {
-  return (
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
   );
 }
