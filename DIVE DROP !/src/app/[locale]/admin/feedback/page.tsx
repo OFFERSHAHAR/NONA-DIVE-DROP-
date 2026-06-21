@@ -200,9 +200,13 @@ export default function FeedbackDashboard() {
       <div className="space-y-4">
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <label htmlFor="feedback-search" className="sr-only">
+              Search by diver name or site
+            </label>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" aria-hidden="true" />
             <input
-              type="text"
+              id="feedback-search"
+              type="search"
               placeholder="Search by diver name or site..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -226,10 +230,11 @@ export default function FeedbackDashboard() {
           <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="filter-dive-site" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Dive Site
                 </label>
                 <select
+                  id="filter-dive-site"
                   value={filters.dive_site_id || ''}
                   onChange={e => handleFilterChange('dive_site_id', e.target.value || undefined)}
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
@@ -244,10 +249,11 @@ export default function FeedbackDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="filter-date-from" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Date From
                 </label>
                 <input
+                  id="filter-date-from"
                   type="date"
                   value={filters.dateFrom || ''}
                   onChange={e => handleFilterChange('dateFrom', e.target.value || undefined)}
@@ -256,10 +262,11 @@ export default function FeedbackDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="filter-date-to" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Date To
                 </label>
                 <input
+                  id="filter-date-to"
                   type="date"
                   value={filters.dateTo || ''}
                   onChange={e => handleFilterChange('dateTo', e.target.value || undefined)}
@@ -287,7 +294,7 @@ export default function FeedbackDashboard() {
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-800 dark:text-red-400">
+        <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-800 dark:text-red-400">
           {error}
         </div>
       )}
