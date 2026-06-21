@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify admin authorization
     const supabase = (await createClient()) as any;
     const {
@@ -38,7 +39,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('feedback')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('Database error:', error);

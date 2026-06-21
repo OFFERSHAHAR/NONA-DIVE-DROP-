@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { withRateLimit } from '@/lib/security/rate-limiter';
 
-export async function GET(request: NextRequest) {
-  try {
-    // Verify admin authorization
+export const GET = withRateLimit(
+  async (request: NextRequest) => {
+    try {
+      // Verify admin authorization
     const supabase = (await createClient()) as any;
     const {
       data: { user },
@@ -153,4 +155,6 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+},
+  { maxRequests: 30, windowSeconds: 60 } // 30 requests per minute for admin
+);

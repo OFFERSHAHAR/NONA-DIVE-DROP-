@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify admin authorization
     const supabase = (await createClient()) as any;
     const {
@@ -34,7 +36,21 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
+    const flagSchema = z.object({
+      reason: z.string().max(500, 'Reason must be 500 characters or less').optional(),
+    });
+
+    let body;
+    try {
+      body = await request.json();
+      flagSchema.parse(body);
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
     const reason = body.reason || 'Flagged by admin';
 
     // Update feedback status to flagged with reason
@@ -47,7 +63,7 @@ export async function POST(
         flagged_by: user.id,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .maybeSingle();
 

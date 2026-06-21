@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify admin authorization
     const supabase = (await createClient()) as any;
     const {
@@ -57,7 +58,7 @@ export async function GET(
         dive_sites!dive_site_id(name)
       `
       )
-      .eq('id', params.id)
+      .eq('id', id)
       .maybeSingle();
 
     if (error) {

@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify admin authorization
     const supabase = (await createClient()) as any;
     const {
@@ -41,7 +42,7 @@ export async function POST(
         status: 'approved',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .maybeSingle();
 
