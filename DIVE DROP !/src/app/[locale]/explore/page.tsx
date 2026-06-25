@@ -10,6 +10,14 @@ import type { Database } from '@/types/supabase';
 
 type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
 
+const referenceSites: DiveSite[] = [
+  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-3', name: 'שונית הכרישים', description: 'צלילה מאתגרת יותר עם נוף כחול פתוח.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 35, difficulty: 'hard', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-4', name: 'שונית הדולפינים', description: 'אתר אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+];
+
 async function getAllDiveSites(): Promise<DiveSite[]> {
   try {
     const supabase = await createClient();
@@ -17,10 +25,28 @@ async function getAllDiveSites(): Promise<DiveSite[]> {
       .from('dive_sites')
       .select('*')
       .order('created_at', { ascending: false });
-    return data || [];
+    if (!data || data.length === 0) return referenceSites;
+
+    const seen = new Set<string>();
+    const normalized = data.map((site, index) => ({
+      ...site,
+      name: site.name || referenceSites[index % referenceSites.length].name,
+      description: site.description || referenceSites[index % referenceSites.length].description,
+      location: site.location || 'אילת',
+      depth: site.depth || referenceSites[index % referenceSites.length].depth,
+      difficulty: site.difficulty || referenceSites[index % referenceSites.length].difficulty,
+      image_url: '/divedrop-hero-v2.png',
+    }));
+
+    return normalized.filter((site) => {
+      const key = site.name.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   } catch (err) {
     console.error('Error fetching dive sites:', err);
-    return [];
+    return referenceSites;
   }
 }
 
@@ -262,9 +288,6 @@ function getDifficultyDotClass(difficulty: string): string {
 }
 
 function getDiveSiteImage(name: string): string {
-  const normalized = name.toLowerCase();
-  if (normalized.includes('blue hole')) return 'https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=1000&h=650&fit=crop';
-  if (normalized.includes('palau')) return 'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=1000&h=650&fit=crop';
-  if (normalized.includes('barrier')) return 'https://images.unsplash.com/photo-1530053969600-caed2596d242?w=1000&h=650&fit=crop';
-  return 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1000&h=650&fit=crop';
+  void name;
+  return '/divedrop-hero-v2.png';
 }

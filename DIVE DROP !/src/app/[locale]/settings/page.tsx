@@ -14,15 +14,19 @@ interface SettingsPageProps {
 export default async function SettingsPage({ params }: SettingsPageProps) {
   const { locale } = await params;
   const t = await getTranslations('settings');
-  const supabase = await createClient();
+  let supabase;
+  let user;
 
-  // Check authentication
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    supabase = await createClient();
+    const authResult = await supabase.auth.getUser();
+    user = authResult.data.user;
+  } catch {
+    redirect(`/${locale}/auth/login?next=/${locale}/settings`);
+  }
 
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    redirect(`/${locale}/auth/login?next=/${locale}/settings`);
   }
 
   // Fetch user profile data

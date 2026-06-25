@@ -7,7 +7,7 @@ export default async function ProfilePage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    redirect(`/${locale}/auth/login?next=/${locale}/profile`);
   }
 
   return (

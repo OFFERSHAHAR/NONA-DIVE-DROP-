@@ -394,7 +394,7 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    redirect(`/${locale}/auth/login?next=/${locale}/dashboard`);
   }
 
   // Get user profile info

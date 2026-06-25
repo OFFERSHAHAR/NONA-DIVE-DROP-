@@ -213,7 +213,7 @@ export default function SettingsClient({ initialData, locale }: SettingsClientPr
           {/* Change Password Link */}
           <div className="pt-4 border-t border-border-secondary">
             <p className="text-sm text-text-secondary mb-4">{t('password_description')}</p>
-            <Link href={`/${locale}/auth/change-password`}>
+            <Link href={`/${locale}/auth/update-password`}>
               <Button variant="secondary" size="md">
                 {t('change_password_button')}
               </Button>

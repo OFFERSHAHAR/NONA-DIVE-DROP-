@@ -28,7 +28,7 @@ export default async function HomePage() {
     id: sites[index]?.id ?? `reference-site-${index}`,
     name: isRTL ? fallbackSiteNames[index] : (sites[index]?.name ?? ['Japanese Gardens', 'The Rock', 'Satil Wreck', 'Dolphin Reef'][index]),
     depth: sites[index]?.depth ?? [18, 30, 28, 20][index],
-    image: sites[index]?.image_url || '/divedrop-hero-v2.png',
+    image: '/divedrop-hero-v2.png',
   }));
   const recommendedBadges = [
     { icon: 'check' as AppIconName, label: isRTL ? 'מתאים לך' : 'Good match', color: 'bg-emerald-500' },
@@ -46,6 +46,25 @@ export default async function HomePage() {
     { icon: 'users' as AppIconName, label: isRTL ? 'צלילות' : 'Dives', href: `/${locale}/my-dives`, mobileOnly: true },
   ];
 
+  const mvpModules = [
+    {
+      title: isRTL ? 'צלילה חופשית' : 'Free Diving',
+      text: isRTL ? 'אימונים, דיסציפלינות ופעילויות קהילה עם גרפיקה ייעודית.' : 'Training, disciplines and community activities with a dedicated visual kit.',
+      href: `/${locale}/free-diving`,
+      badge: isRTL ? 'חדש במערכת' : 'New module',
+      icon: '/assets/freediving/icons/services/breath-badge.svg',
+      tone: 'from-cyan-500 to-blue-700',
+    },
+    {
+      title: isRTL ? 'השכרת ציוד' : 'Equipment Rental',
+      text: isRTL ? 'מסכות, סנפירים, חליפות וחבילות לקבוצות מתוך תהליך ההזמנה.' : 'Masks, fins, suits and group bundles connected to the booking flow.',
+      href: `/${locale}/equipment`,
+      badge: isRTL ? 'MVP פעיל' : 'MVP ready',
+      icon: '/assets/freediving/icons/services/equipment-rental.svg',
+      tone: 'from-blue-700 to-sky-400',
+    },
+  ];
+
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-[#f3f7fc] text-[#10264b]">
       <div dir="ltr" className="mx-auto grid max-w-[1536px] gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_475px] lg:gap-6 lg:p-0">
@@ -56,9 +75,19 @@ export default async function HomePage() {
 
             <div className="absolute inset-x-7 bottom-[330px] text-right text-white lg:inset-x-auto lg:bottom-auto lg:right-14 lg:top-1/2 lg:w-[40%] lg:-translate-y-1/2">
               <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
-                {isRTL ? 'ברוך הבא' : 'Welcome'}
-                <br />
-                <span className="text-cyan-300">DiveDrop</span>{isRTL ? '־ל' : ''}
+                {isRTL ? (
+                  <>
+                    ברוך הבא
+                    <br />
+                    <span className="text-cyan-300">ל־DiveDrop</span>
+                  </>
+                ) : (
+                  <>
+                    Welcome to
+                    <br />
+                    <span className="text-cyan-300">DiveDrop</span>
+                  </>
+                )}
               </h1>
               <p className="mt-4 w-full max-w-[420px] !text-lg !leading-8 !text-white lg:mt-5 lg:!text-2xl lg:!leading-10">
                 {isRTL ? 'הדרך החכמה שלך לצלילה בטוחה, אחראית ומקצועית.' : 'Your smart way to safe, responsible and professional diving.'}
@@ -98,6 +127,33 @@ export default async function HomePage() {
               ))}
             </div>
           </section>
+
+          <section className="rounded-[28px] bg-white p-4 shadow-[0_12px_35px_rgba(15,63,110,.08)] sm:p-6">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-extrabold leading-8">{isRTL ? 'מודולים חדשים' : 'New modules'}</h2>
+                <p className="text-sm font-semibold text-slate-500">{isRTL ? 'צלילה חופשית והשכרת ציוד מחוברים לממשק.' : 'Free diving and equipment rental are now part of the interface.'}</p>
+              </div>
+              <AppIcon name="waves" className="h-8 w-8 text-cyan-500" />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {mvpModules.map((module) => (
+                <Link key={module.href} href={module.href} className="group overflow-hidden rounded-[24px] border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-4 transition hover:-translate-y-1 hover:shadow-xl">
+                  <div className="flex items-center gap-4">
+                    <span className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${module.tone} p-3 shadow-lg`}>
+                      <img src={module.icon} alt="" className="h-full w-full invert" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <span className="inline-flex rounded-full bg-cyan-100 px-3 py-1 text-xs font-black text-blue-700">{module.badge}</span>
+                      <h3 className="mt-2 text-xl font-black text-[#10264b]">{module.title}</h3>
+                    </div>
+                    <AppIcon name={isRTL ? 'arrow-left' : 'arrow-right'} className="h-6 w-6 text-blue-600 transition group-hover:translate-x-1" />
+                  </div>
+                  <p className="mt-4 leading-7 text-slate-600">{module.text}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
 
         <aside dir={isRTL ? 'rtl' : 'ltr'} className="space-y-5 px-4 lg:px-0 lg:pr-6 lg:pt-5">
@@ -117,6 +173,14 @@ export default async function HomePage() {
               <select name="level" aria-label="דרגת צולל" className="rounded-xl border-slate-200 bg-white"><option value="advanced">Advanced Open Water</option><option value="rescue">Rescue Diver</option><option value="divemaster">Divemaster</option></select>
               <button type="submit" className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-blue-700 to-cyan-500 font-bold text-white shadow-lg"><AppIcon name="search" className="h-5 w-5" />{isRTL ? 'חפש' : 'Search'}</button>
             </form>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {mvpModules.map((module) => (
+                <Link key={module.href} href={module.href} className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-center font-extrabold text-blue-800 transition hover:bg-blue-100">
+                  <img src={module.icon} alt="" className="mx-auto mb-2 h-7 w-7" />
+                  {module.title}
+                </Link>
+              ))}
+            </div>
           </section>
 
           <section className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">

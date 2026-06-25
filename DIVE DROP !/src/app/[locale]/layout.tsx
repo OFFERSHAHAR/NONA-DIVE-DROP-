@@ -38,7 +38,7 @@ export default async function LocaleLayout({
       <body className="bg-light-bg dark:bg-dark-bg text-text-primary dark:text-text-light">
         <NextIntlClientProvider locale={locale}>
           <Header />
-          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
+          <main className="min-h-screen pb-32 md:pb-28">{children}</main>
           <AppNavigation />
         </NextIntlClientProvider>
       </body>
