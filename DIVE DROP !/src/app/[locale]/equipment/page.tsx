@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { AppIcon } from '@/components/AppIcon';
+import { getPublishedContentItemsByKind, type ContentItem } from '@/lib/content/public-content';
 
 const equipment = [
   {
@@ -25,9 +26,27 @@ const equipment = [
   },
 ];
 
+function metadataRecord(item: ContentItem) {
+  return item.metadata && typeof item.metadata === 'object' && !Array.isArray(item.metadata)
+    ? item.metadata as Record<string, unknown>
+    : {};
+}
+
 export default async function EquipmentPage() {
   const locale = await getLocale();
   const isRTL = locale === 'he';
+  const uploadedEquipment = await getPublishedContentItemsByKind('equipment');
+  const visibleEquipment = uploadedEquipment.length > 0
+    ? uploadedEquipment.map((item) => {
+        const metadata = metadataRecord(item);
+        return {
+          title: { he: item.title_he, en: item.title_en || item.title_he },
+          desc: { he: item.summary_he, en: item.summary_en || item.summary_he },
+          icon: typeof metadata.icon === 'string' ? metadata.icon : 'equipment-rental',
+          image: item.image_url,
+        };
+      })
+    : equipment;
 
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-[#eef5fb] pb-28 text-[#08234a]">
@@ -51,17 +70,22 @@ export default async function EquipmentPage() {
 
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
         <section className="grid gap-4 sm:grid-cols-2">
-          {equipment.map((item) => (
-            <article key={item.icon} className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
-              <div className="mb-4 flex items-center gap-4">
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-700 p-3 shadow-lg">
-                  <img src={`/assets/freediving/icons/services/${item.icon}.svg`} alt="" className="h-full w-full invert" />
-                </span>
-                <h2 className="text-xl font-black">{isRTL ? item.title.he : item.title.en}</h2>
-              </div>
-              <p className="leading-7 text-slate-600">{isRTL ? item.desc.he : item.desc.en}</p>
-            </article>
-          ))}
+          {visibleEquipment.map((item) => {
+            const imageSrc = 'image' in item && typeof item.image === 'string' && item.image
+              ? item.image
+              : `/assets/freediving/icons/services/${item.icon}.svg`;
+            return (
+              <article key={`${item.icon}-${item.title.he}`} className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
+                <div className="mb-4 flex items-center gap-4">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-700 p-3 shadow-lg">
+                    <img src={imageSrc} alt="" className="h-full w-full invert" />
+                  </span>
+                  <h2 className="text-xl font-black">{isRTL ? item.title.he : item.title.en}</h2>
+                </div>
+                <p className="leading-7 text-slate-600">{isRTL ? item.desc.he : item.desc.en}</p>
+              </article>
+            );
+          })}
         </section>
 
         <section className="overflow-hidden rounded-[30px] bg-white shadow-[0_12px_35px_rgba(15,63,110,.10)]">
@@ -80,7 +104,7 @@ export default async function EquipmentPage() {
                   </div>
                 ))}
               </div>
-              <Link href={`/${locale}/auth/login?next=/${locale}/equipment`} className="mt-6 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-blue-700 to-cyan-500 px-5 font-black text-white shadow-lg">
+              <Link href={`/${locale}/bookings?module=equipment`} className="mt-6 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-blue-700 to-cyan-500 px-5 font-black text-white shadow-lg">
                 <AppIcon name="calendar" className="h-5 w-5" />
                 {isRTL ? 'בקשת השכרת ציוד' : 'Request equipment'}
               </Link>

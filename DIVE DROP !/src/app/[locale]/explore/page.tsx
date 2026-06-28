@@ -5,10 +5,60 @@ import { getLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { Card, CardBody } from '@/components/Card';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
-import { createClient } from '@/lib/supabase/server';
-import type { Database } from '@/types/supabase';
+import { getPublishedDiveSites, getPublishedServiceCatalog, type DiveSite, type ServiceCatalogEntry, type ServiceCategoryKey } from '@/lib/content/public-content';
 
-type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
+const serviceCatalog: Record<ServiceCategoryKey, ServiceCatalogEntry> = {
+  clubs: {
+    title: { he: 'מועדוני צלילה', en: 'Dive Clubs' },
+    subtitle: { he: 'מועדונים זמינים להזמנות, ציוד, הדרכות וצלילות סירה.', en: 'Clubs available for bookings, gear, courses and boat dives.' },
+    icon: 'store',
+    items: [
+      { title: 'DiveDrop Club Eilat', desc: 'מועדון בית עם איסוף ציוד, תדריך ויציאה לאתרים מובילים.', badge: 'פתוח היום', icon: 'store' },
+      { title: 'Blue Reef Center', desc: 'צלילות מודרכות, השכרת ציוד וחבילות לקבוצות.', badge: 'מומלץ', icon: 'coral' },
+      { title: 'South Bay Divers', desc: 'התאמה לצוללים מתחילים ומתקדמים כולל ליווי מדריך.', badge: 'זמין להזמנה', icon: 'users' },
+    ],
+  },
+  instructors: {
+    title: { he: 'מדריכי צלילה', en: 'Dive Instructors' },
+    subtitle: { he: 'מדריכים זמינים לליווי, קורסים, בדיקת כשירות וצלילות מודרכות.', en: 'Available instructors for guiding, courses, readiness checks and assisted dives.' },
+    icon: 'user',
+    items: [
+      { title: 'אורי לוי', desc: 'מדריך Advanced Open Water, מומחה לצלילות עומק וסטי"ל.', badge: 'זמין היום', icon: 'award' },
+      { title: 'נועה בן דוד', desc: 'ליווי לצוללים חוזרים, איזון, נשימה ובטיחות.', badge: 'דירוג גבוה', icon: 'star' },
+      { title: 'צוות DiveDrop', desc: 'התאמת מדריך לפי אתר, רמה ושעת יציאה.', badge: 'התאמה חכמה', icon: 'check' },
+    ],
+  },
+  pickups: {
+    title: { he: 'הסעות לצלילות', en: 'Dive Pickups' },
+    subtitle: { he: 'איסוף מהמלון/המרכז, ציוד בדרך וחזרה מסודרת אחרי הצלילה.', en: 'Pickup from hotel/center, gear on route, and return after the dive.' },
+    icon: 'van',
+    items: [
+      { title: 'איסוף מהמרכז', desc: 'יציאה כל 30 דקות לאתרים המרכזיים באילת.', badge: 'מהיר', icon: 'van' },
+      { title: 'הסעת קבוצה', desc: 'רכב לקבוצות עם מקום לציוד רטוב ויבש.', badge: 'לקבוצות', icon: 'users' },
+      { title: 'איסוף + ציוד', desc: 'חבילת הסעה יחד עם מסכה, סנפירים וחליפה.', badge: 'חבילה', icon: 'calendar' },
+    ],
+  },
+  boat: {
+    title: { he: 'צלילות סירה', en: 'Boat Dives' },
+    subtitle: { he: 'יציאות סירה מתוכננות עם מדריך, ציוד ותדריך בטיחות.', en: 'Scheduled boat departures with guide, gear and safety briefing.' },
+    icon: 'boat',
+    items: [
+      { title: 'יציאת בוקר', desc: 'צלילת סירה מודרכת לשונית פתוחה, כולל תדריך.', badge: '08:00', icon: 'boat' },
+      { title: 'שונית הכרישים', desc: 'מסלול מתקדם עם מדריך חובה ותכנון עומק.', badge: 'מתקדם', icon: 'award' },
+      { title: 'סירה + ציוד', desc: 'חבילת סירה מלאה עם השכרת ציוד במקום.', badge: 'פופולרי', icon: 'fire' },
+    ],
+  },
+  dive: {
+    title: { he: 'חיפוש צלילה', en: 'Find a Dive' },
+    subtitle: { he: 'בחר סוג פעילות והמשך למסך הזמנה מסודר.', en: 'Choose an activity type and continue to a structured booking screen.' },
+    icon: 'diver',
+    items: [
+      { title: 'צלילה מודרכת', desc: 'בחירת אתר, מדריך ושעת יציאה.', badge: 'MVP פעיל', icon: 'diver' },
+      { title: 'צלילה חופשית', desc: 'אימון, דיסציפלינה ופעילות קהילה.', badge: 'חדש', icon: 'waves' },
+      { title: 'השכרת ציוד', desc: 'מסכות, סנפירים, חליפות וחבילות קבוצתיות.', badge: 'מחובר', icon: 'calendar' },
+    ],
+  },
+};
 
 const referenceSites: DiveSite[] = [
   { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
@@ -19,35 +69,7 @@ const referenceSites: DiveSite[] = [
 ];
 
 async function getAllDiveSites(): Promise<DiveSite[]> {
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from('dive_sites')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (!data || data.length === 0) return referenceSites;
-
-    const seen = new Set<string>();
-    const normalized = data.map((site, index) => ({
-      ...site,
-      name: site.name || referenceSites[index % referenceSites.length].name,
-      description: site.description || referenceSites[index % referenceSites.length].description,
-      location: site.location || 'אילת',
-      depth: site.depth || referenceSites[index % referenceSites.length].depth,
-      difficulty: site.difficulty || referenceSites[index % referenceSites.length].difficulty,
-      image_url: '/divedrop-hero-v2.png',
-    }));
-
-    return normalized.filter((site) => {
-      const key = site.name.trim().toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  } catch (err) {
-    console.error('Error fetching dive sites:', err);
-    return referenceSites;
-  }
+  return getPublishedDiveSites(referenceSites);
 }
 
 type ExploreSearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -62,6 +84,15 @@ export default async function ExplorePage({ searchParams }: { searchParams: Expl
   const selectedSite = typeof query.site === 'string' ? query.site : '';
   const category = typeof query.category === 'string' ? query.category : '';
   const searchType = typeof query.type === 'string' ? query.type : '';
+  const serviceKey = (
+    category && category in serviceCatalog
+      ? category
+      : searchType === 'boat'
+        ? 'boat'
+        : searchType === 'dive'
+          ? 'dive'
+          : ''
+  ) as ServiceCategoryKey | '';
   const selectedDate = typeof query.date === 'string' ? query.date : '';
   const selectedLevel = typeof query.level === 'string' ? query.level : '';
   const diveSites = allDiveSites.filter((site) => {
@@ -84,6 +115,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Expl
   };
   const activeTitle = categoryTitles[category] || typeTitles[searchType];
   const pageTitle = activeTitle ? (isRTL ? activeTitle.he : activeTitle.en) : (isRTL ? 'אתרי צלילה' : 'Dive Sites');
+  const activeService = serviceKey ? await getPublishedServiceCatalog(serviceKey, serviceCatalog) : null;
   const activeCriteria = [
     selectedDate && `${isRTL ? 'תאריך' : 'Date'}: ${selectedDate}`,
     selectedLevel && `${isRTL ? 'דרגה' : 'Level'}: ${selectedLevel}`,
@@ -145,8 +177,40 @@ export default async function ExplorePage({ searchParams }: { searchParams: Expl
           </div>
         )}
 
+        {activeService && (
+          <section className="mb-8 rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <span className="inline-flex rounded-full bg-cyan-100 px-3 py-1 text-xs font-black text-blue-700">{isRTL ? 'מסלול MVP מחובר' : 'Connected MVP flow'}</span>
+                <h2 className="mt-3 text-2xl font-black">{isRTL ? activeService.title.he : activeService.title.en}</h2>
+                <p className="mt-2 leading-7 text-slate-600">{isRTL ? activeService.subtitle.he : activeService.subtitle.en}</p>
+              </div>
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-700 text-white shadow-lg">
+                <AppIcon name={activeService.icon} className="h-8 w-8" />
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {activeService.items.map((item) => (
+                <article key={item.title} className="rounded-3xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-white">
+                      <AppIcon name={item.icon} className="h-6 w-6" />
+                    </span>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-blue-700 shadow-sm">{item.badge}</span>
+                  </div>
+                  <h3 className="text-lg font-black">{item.title}</h3>
+                  <p className="mt-2 min-h-14 text-sm leading-6 text-slate-600">{item.desc}</p>
+                  <Link href={`/${locale}/bookings?category=${serviceKey}${item.slug ? `&item=${encodeURIComponent(item.slug)}` : ''}`} className="mt-4 flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-l from-blue-700 to-cyan-500 px-4 font-black text-white shadow-md">
+                    {isRTL ? 'המשך להזמנה' : 'Continue booking'}
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Filter Chips */}
-        <div className={`flex flex-wrap gap-2 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        {!activeService && <div className={`flex flex-wrap gap-2 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {[
             { id: '', label: t('all'), icon: 'grid' as AppIconName },
             { id: 'easy', label: isRTL ? 'קל' : 'Easy', icon: 'level' as AppIconName },
@@ -165,23 +229,23 @@ export default async function ExplorePage({ searchParams }: { searchParams: Expl
               <span className="flex items-center gap-2"><AppIcon name={filter.icon} className="h-4 w-4" />{filter.label}</span>
             </Link>
           ))}
-        </div>
+        </div>}
 
         {/* Dive Sites Grid */}
-        {diveSites.length > 0 ? (
+        {!activeService && diveSites.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {diveSites.map((site) => (
               <DiveSiteCardExplore key={site.id} site={site} locale={locale} isRTL={isRTL} />
             ))}
           </div>
-        ) : (
+        ) : !activeService ? (
           <div className="text-center py-12">
             <AppIcon name="waves" className="mx-auto mb-4 h-16 w-16 text-cyan-500" />
             <p className="text-text-secondary dark:text-text-secondary-light">
               {isRTL ? 'לא נמצאו אתרי צלילה' : 'No dive sites found'}
             </p>
           </div>
-        )}
+        ) : null}
 
       </div>
     </div>
@@ -256,7 +320,7 @@ function DiveSiteCardExplore({ site, locale, isRTL }: DiveSiteCardExploreProps) 
 
         {/* Action Buttons */}
         <div className={`flex gap-2 pt-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <Link href={`/${locale}/my-dives?site=${site.id}`} className="flex flex-1 items-center justify-center rounded-lg bg-primary py-2 font-semibold text-white hover:bg-primary-dark">
+          <Link href={`/${locale}/bookings?site=${site.id}`} className="flex flex-1 items-center justify-center rounded-lg bg-primary py-2 font-semibold text-white hover:bg-primary-dark">
             {isRTL ? 'בחר' : 'Select'}
           </Link>
           <Link href={`/${locale}/explore/${site.id}`} className="flex flex-1 items-center justify-center rounded-lg border border-primary py-2 font-semibold text-primary hover:bg-primary/10 dark:border-cyan-accent dark:text-cyan-accent dark:hover:bg-cyan-accent/10">

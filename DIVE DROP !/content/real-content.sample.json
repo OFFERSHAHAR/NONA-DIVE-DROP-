@@ -1,0 +1,148 @@
+{
+  "items": [
+    {
+      "kind": "dive_site",
+      "slug": "japanese-gardens-eilat",
+      "title_he": "הגנים היפנים",
+      "title_en": "Japanese Gardens",
+      "summary_he": "שונית צבעונית ונגישה לצלילה רגועה עם ראות טובה וחיים ימיים עשירים.",
+      "summary_en": "A calm, colorful reef with good visibility and rich marine life.",
+      "location": "אילת",
+      "image_url": "/divedrop-hero-v2.png",
+      "tags": ["reef", "eilat", "beginner"],
+      "metadata": {
+        "difficulty": "easy",
+        "depth": 18,
+        "latitude": 29.5,
+        "longitude": 34.9,
+        "duration_minutes": 45,
+        "transport": "מחוף",
+        "rating": 4.8,
+        "badge": "מתאים לך"
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "dive_site",
+      "slug": "satil-wreck-eilat",
+      "title_he": "הסטי\"ל",
+      "title_en": "Satil Wreck",
+      "summary_he": "צלילת כלי שיט טבועה עם מסלול ברור, עומק בינוני ונקודות צילום חזקות.",
+      "summary_en": "A wreck dive with a clear route, medium depth and strong photo points.",
+      "location": "אילת",
+      "image_url": "/divedrop-hero-v2.png",
+      "tags": ["wreck", "eilat", "advanced-open-water"],
+      "metadata": {
+        "difficulty": "intermediate",
+        "depth": 28,
+        "latitude": 29.5,
+        "longitude": 34.9,
+        "duration_minutes": 50,
+        "transport": "מהמרכז",
+        "rating": 4.9,
+        "badge": "עם מדריך מומלץ"
+      },
+      "sort_order": 20
+    },
+    {
+      "kind": "club",
+      "slug": "divedrop-club-eilat",
+      "title_he": "DiveDrop Club Eilat",
+      "title_en": "DiveDrop Club Eilat",
+      "summary_he": "מועדון בית עם השכרת ציוד, תדריכי בטיחות, יציאות סירה וליווי מדריכים.",
+      "summary_en": "Home club with gear rental, safety briefings, boat dives and guided dives.",
+      "location": "המרכז הימי, אילת",
+      "metadata": {
+        "icon": "store",
+        "badge": "פתוח היום",
+        "phone": "050-0000000",
+        "services": ["ציוד", "צלילות סירה", "מדריכים"]
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "instructor",
+      "slug": "ori-levi-instructor",
+      "title_he": "אורי לוי",
+      "title_en": "Ori Levi",
+      "summary_he": "מדריך Advanced Open Water עם התמחות בצלילות עומק, סטי\"ל ותכנון צלילה אחראי.",
+      "summary_en": "Advanced Open Water instructor focused on depth, wreck dives and responsible planning.",
+      "location": "אילת",
+      "metadata": {
+        "icon": "award",
+        "badge": "זמין היום",
+        "rating": 4.9
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "pickup",
+      "slug": "hotel-pickup-eilat",
+      "title_he": "איסוף מהמלון",
+      "title_en": "Hotel pickup",
+      "summary_he": "איסוף מסודר מהמלון, עצירה לציוד וחזרה אחרי הצלילה.",
+      "summary_en": "Hotel pickup, gear stop and return after the dive.",
+      "location": "אילת",
+      "metadata": {
+        "icon": "van",
+        "badge": "מהיר"
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "boat",
+      "slug": "morning-boat-dive",
+      "title_he": "יציאת סירה בוקר",
+      "title_en": "Morning boat dive",
+      "summary_he": "יציאה מודרכת לשונית פתוחה, כולל תדריך, ציוד ותכנון עומק.",
+      "summary_en": "Guided morning boat dive with briefing, gear and depth planning.",
+      "location": "מרינה אילת",
+      "metadata": {
+        "icon": "boat",
+        "badge": "08:00"
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "dive_option",
+      "slug": "guided-dive",
+      "title_he": "צלילה מודרכת",
+      "title_en": "Guided dive",
+      "summary_he": "בחירת אתר, מדריך, שעת יציאה ותוספות ציוד.",
+      "summary_en": "Choose site, instructor, time and gear add-ons.",
+      "metadata": {
+        "icon": "diver",
+        "badge": "MVP פעיל"
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "free_diving",
+      "slug": "free-diving-training",
+      "title_he": "אימון צלילה חופשית",
+      "title_en": "Free diving training",
+      "summary_he": "אימון נשימה, טכניקה ובטיחות עם מדריך מוסמך.",
+      "summary_en": "Breathwork, technique and safety training with a certified guide.",
+      "image_url": "/assets/freediving/backgrounds/freediving-hero.svg",
+      "metadata": {
+        "badge": "חדש",
+        "discipline": "training"
+      },
+      "sort_order": 10
+    },
+    {
+      "kind": "equipment",
+      "slug": "mask-fins-suit-kit",
+      "title_he": "ערכת מסכה, סנפירים וחליפה",
+      "title_en": "Mask, fins and suit kit",
+      "summary_he": "ערכת ציוד בסיסית לצלילה מודרכת או צלילה חופשית.",
+      "summary_en": "Basic rental kit for guided dives or free diving.",
+      "image_url": "/assets/freediving/icons/services/equipment-rental.svg",
+      "metadata": {
+        "badge": "זמין להשכרה",
+        "price_note": "מחיר לפי משך פעילות"
+      },
+      "sort_order": 10
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { AppIcon } from '@/components/AppIcon';
+import { getPublishedContentItemsByKind, type ContentItem } from '@/lib/content/public-content';
 
 const disciplines = [
   {
@@ -36,9 +37,27 @@ const services = [
   { title: { he: 'פעילויות כלליות', en: 'Open activities' }, icon: 'general-activities' },
 ];
 
+function metadataRecord(item: ContentItem) {
+  return item.metadata && typeof item.metadata === 'object' && !Array.isArray(item.metadata)
+    ? item.metadata as Record<string, unknown>
+    : {};
+}
+
 export default async function FreeDivingPage() {
   const locale = await getLocale();
   const isRTL = locale === 'he';
+  const uploadedServices = await getPublishedContentItemsByKind('free_diving');
+  const visibleServices: Array<{ title: { he: string; en: string }; icon: string; image?: string; desc: { he: string; en: string } }> = uploadedServices.length > 0
+    ? uploadedServices.map((item) => {
+        const metadata = metadataRecord(item);
+        return {
+          title: { he: item.title_he, en: item.title_en || item.title_he },
+          icon: typeof metadata.icon === 'string' ? metadata.icon : 'breath-badge',
+          image: item.image_url,
+          desc: { he: item.summary_he, en: item.summary_en || item.summary_he },
+        };
+      })
+    : services.map((item) => ({ ...item, desc: { he: '', en: '' } }));
 
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-[#eef5fb] pb-28 text-[#08234a]">
@@ -90,14 +109,20 @@ export default async function FreeDivingPage() {
         <section className="rounded-[28px] bg-[#062b5b] p-5 text-white shadow-[0_12px_35px_rgba(15,63,110,.18)] sm:p-7">
           <h2 className="text-2xl font-black">{isRTL ? 'שירותים זמינים ב-MVP' : 'MVP services'}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-4">
-            {services.map((item) => (
-              <div key={item.icon} className="rounded-2xl bg-white/10 p-4 text-center backdrop-blur">
-                <img src={`/assets/freediving/icons/services/${item.icon}.svg`} alt="" className="mx-auto mb-3 h-10 w-10 invert" />
-                <div className="font-extrabold">{isRTL ? item.title.he : item.title.en}</div>
-              </div>
-            ))}
+            {visibleServices.map((item) => {
+              const imageSrc = 'image' in item && typeof item.image === 'string' && item.image
+                ? item.image
+                : `/assets/freediving/icons/services/${item.icon}.svg`;
+              return (
+                <div key={`${item.icon}-${item.title.he}`} className="rounded-2xl bg-white/10 p-4 text-center backdrop-blur">
+                  <img src={imageSrc} alt="" className="mx-auto mb-3 h-10 w-10 invert" />
+                  <div className="font-extrabold">{isRTL ? item.title.he : item.title.en}</div>
+                  {item.desc.he && <p className="mt-2 text-xs leading-5 text-cyan-50">{isRTL ? item.desc.he : item.desc.en}</p>}
+                </div>
+              );
+            })}
           </div>
-          <Link href={`/${locale}/auth/login?next=/${locale}/free-diving`} className="mt-6 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-blue-600 to-cyan-400 px-5 font-black text-white shadow-lg">
+          <Link href={`/${locale}/bookings?module=free-diving`} className="mt-6 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-blue-600 to-cyan-400 px-5 font-black text-white shadow-lg">
             <AppIcon name="calendar" className="h-5 w-5" />
             {isRTL ? 'הצטרפות לאימון' : 'Join a session'}
           </Link>

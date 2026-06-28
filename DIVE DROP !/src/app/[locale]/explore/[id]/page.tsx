@@ -3,29 +3,19 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AppIcon } from '@/components/AppIcon';
-import { createClient } from '@/lib/supabase/server';
-import type { Database } from '@/types/supabase';
+import { getDiveSiteById, type DiveSite } from '@/lib/content/public-content';
 
-type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
 
 const referenceSites: DiveSite[] = [
   { id: 'reference-site-0', name: 'הגנים היפנים', description: 'אתר שונית צבעוני ונגיש לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
   { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
   { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-3', name: 'שונית הדולפינים', description: 'אתר שונית אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-3', name: 'שונית הכרישים', description: 'צלילה מאתגרת יותר עם נוף כחול פתוח.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 35, difficulty: 'hard', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-4', name: 'שונית הדולפינים', description: 'אתר שונית אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
 ];
 
 async function getDiveSite(id: string): Promise<DiveSite | null> {
-  const referenceSite = referenceSites.find((site) => site.id === id);
-  if (referenceSite) return referenceSite;
-
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase.from('dive_sites').select('*').eq('id', id).maybeSingle();
-    return data ? { ...data, image_url: '/divedrop-hero-v2.png' } : null;
-  } catch {
-    return null;
-  }
+  return getDiveSiteById(id, referenceSites);
 }
 
 export default async function DiveSiteDetailsPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -76,7 +66,7 @@ export default async function DiveSiteDetailsPage({ params }: { params: Promise<
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Link href={`/${locale}/my-dives?site=${site.id}`} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-blue-700 to-cyan-500 px-5 font-extrabold text-white shadow-lg hover:brightness-105">
+              <Link href={`/${locale}/bookings?site=${site.id}`} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-blue-700 to-cyan-500 px-5 font-extrabold text-white shadow-lg hover:brightness-105">
                 <AppIcon name="calendar" className="h-5 w-5" />{isRTL ? 'בחירת הצלילה' : 'Select this dive'}
               </Link>
               <Link href={`/${locale}/auth/login?next=/${locale}/explore/${site.id}`} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-blue-700 px-5 font-extrabold text-blue-700 hover:bg-blue-50">

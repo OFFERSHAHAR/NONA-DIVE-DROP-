@@ -57,9 +57,9 @@ export const BottomNavigationPresets = {
     const he = locale === 'he';
     return [
       { id: 'explore', label: he ? 'גילוי' : 'Explore', href: `/${locale}/explore`, ariaLabel: he ? 'גלה אתרי צלילה' : 'Explore dive sites' },
-      { id: 'my-dives', label: he ? 'הצלילות' : 'My dives', href: `/${locale}/my-dives`, ariaLabel: he ? 'הצלילות שלי' : 'My dives' },
+      { id: 'my-dives', label: he ? 'צלילה' : 'Dive', href: `/${locale}/bookings?category=dive`, ariaLabel: he ? 'בקשת צלילה' : 'Dive request' },
       { id: 'home', label: he ? 'בית' : 'Home', href: `/${locale}`, ariaLabel: he ? 'דף הבית' : 'Home' },
-      { id: 'dashboard', label: he ? 'הזמנות' : 'Bookings', href: `/${locale}/dashboard`, ariaLabel: he ? 'לוח בקרה והזמנות' : 'Dashboard and bookings' },
+      { id: 'dashboard', label: he ? 'הזמנות' : 'Bookings', href: `/${locale}/bookings`, ariaLabel: he ? 'הזמנות צלילה' : 'Dive bookings' },
       { id: 'profile', label: he ? 'פרופיל' : 'Profile', href: `/${locale}/profile`, ariaLabel: he ? 'הפרופיל שלי' : 'My profile' },
     ];
   },

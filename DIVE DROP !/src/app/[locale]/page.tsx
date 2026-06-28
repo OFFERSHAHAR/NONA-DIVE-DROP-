@@ -2,22 +2,21 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
-import { createClient } from '@/lib/supabase/server';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
+import { getPublishedDiveSites } from '@/lib/content/public-content';
 import type { Database } from '@/types/supabase';
 
 type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
 
-const fallbackSiteNames = ['הגנים היפנים', 'הר הסלע', 'הסטי"ל', 'שונית הדולפינים'];
+const referenceSites: DiveSite[] = [
+  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-3', name: 'שונית הדולפינים', description: 'אתר אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+];
 
 async function getFeaturedDiveSites(): Promise<DiveSite[]> {
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase.from('dive_sites').select('*').order('created_at', { ascending: false }).limit(4);
-    return data || [];
-  } catch {
-    return [];
-  }
+  return (await getPublishedDiveSites(referenceSites)).slice(0, 4);
 }
 
 export default async function HomePage() {
@@ -25,10 +24,10 @@ export default async function HomePage() {
   const isRTL = locale === 'he';
   const sites = await getFeaturedDiveSites();
   const displaySites = Array.from({ length: 4 }, (_, index) => ({
-    id: sites[index]?.id ?? `reference-site-${index}`,
-    name: isRTL ? fallbackSiteNames[index] : (sites[index]?.name ?? ['Japanese Gardens', 'The Rock', 'Satil Wreck', 'Dolphin Reef'][index]),
+    id: sites[index]?.id ?? referenceSites[index].id,
+    name: sites[index]?.name ?? referenceSites[index].name,
     depth: sites[index]?.depth ?? [18, 30, 28, 20][index],
-    image: '/divedrop-hero-v2.png',
+    image: sites[index]?.image_url || '/divedrop-hero-v2.png',
   }));
   const recommendedBadges = [
     { icon: 'check' as AppIconName, label: isRTL ? 'מתאים לך' : 'Good match', color: 'bg-emerald-500' },
@@ -43,7 +42,7 @@ export default async function HomePage() {
     { icon: 'diver' as AppIconName, label: isRTL ? 'מדריכים' : 'Instructors', href: `/${locale}/explore?category=instructors` },
     { icon: 'van' as AppIconName, label: isRTL ? 'הסעות' : 'Pickups', href: `/${locale}/explore?category=pickups` },
     { icon: 'boat' as AppIconName, label: isRTL ? 'צלילות סירה' : 'Boat Dives', href: `/${locale}/explore?category=boat` },
-    { icon: 'users' as AppIconName, label: isRTL ? 'צלילות' : 'Dives', href: `/${locale}/my-dives`, mobileOnly: true },
+    { icon: 'users' as AppIconName, label: isRTL ? 'צלילות' : 'Dives', href: `/${locale}/bookings?category=dive`, mobileOnly: true },
   ];
 
   const mvpModules = [
@@ -189,7 +188,7 @@ export default async function HomePage() {
               <div className="flex items-center gap-4"><img src={displaySites[3].image} alt="שונית הכרישים" className="h-20 w-20 rounded-full object-cover" /><div><h3 className="!text-xl !leading-7 font-extrabold">{isRTL ? 'שונית הכרישים' : 'Shark Reef'}</h3><p className="text-slate-500">{isRTL ? 'צלילת סירה מודרכת' : 'Guided boat dive'}</p></div></div>
               <div className="my-4 flex justify-around text-sm text-slate-600"><span className="flex items-center gap-1.5"><AppIcon name="clock" className="h-4 w-4" />08:00</span><span className="flex items-center gap-1.5"><AppIcon name="calendar" className="h-4 w-4" />20.05.2024</span></div>
               <div className="flex gap-2"><span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-2 text-xs"><AppIcon name="users" className="h-4 w-4" />6 משתתפים</span><span className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-2 text-xs"><AppIcon name="user" className="h-4 w-4" />מדריך: אורי לוי</span></div>
-              <Link href={`/${locale}/my-dives`} className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-700">{isRTL ? 'פרטי הצלילה ‹' : 'Dive details ›'}</Link>
+              <Link href={`/${locale}/bookings?category=dive`} className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-blue-50 font-bold text-blue-700">{isRTL ? 'פרטי ההזמנה ‹' : 'Booking details ›'}</Link>
             </div>
           </section>
         </aside>
