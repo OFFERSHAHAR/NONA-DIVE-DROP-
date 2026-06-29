@@ -92,7 +92,13 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </button>
             {isNotificationsOpen && (
-              <div dir={isRTL ? 'rtl' : 'ltr'} className="absolute right-0 top-12 z-[70] w-[min(88vw,320px)] overflow-hidden rounded-2xl border border-blue-100 bg-white text-[#10264b] shadow-2xl">
+              <div
+                dir={isRTL ? 'rtl' : 'ltr'}
+                className={clsx(
+                  'fixed left-3 right-3 top-16 z-[70] overflow-hidden rounded-2xl border border-blue-100 bg-white text-[#10264b] shadow-2xl sm:absolute sm:top-12 sm:w-[min(88vw,320px)]',
+                  isRTL && !isHome ? 'sm:left-0 sm:right-auto' : 'sm:left-auto sm:right-0'
+                )}
+              >
                 <div className="border-b border-blue-100 px-4 py-3 font-bold">{isRTL ? 'התראות' : 'Notifications'}</div>
                 <Link href={`/${locale}/bookings`} onClick={() => setIsNotificationsOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-blue-50"><AppIcon name="calendar" className="mt-0.5 h-5 w-5 text-blue-600" /><span>{isRTL ? 'בדוק את הצלילות וההזמנות הקרובות' : 'Review your upcoming dives'}</span></Link>
                 <Link href={`/${locale}/explore`} onClick={() => setIsNotificationsOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-blue-50"><AppIcon name="star" className="mt-0.5 h-5 w-5 text-blue-600" /><span>{isRTL ? 'נוספו אתרי צלילה מומלצים' : 'New recommended dive sites'}</span></Link>
