@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { notifyBookingLeadOnWhatsApp } from '@/lib/whatsapp/openwa';
 
 type BookingSearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -58,7 +59,7 @@ async function createBookingRequest(formData: FormData) {
     redirect(withStatus(locale, 'config', formData));
   }
 
-  const { error } = await supabase.from('booking_requests').insert({
+  const bookingPayload = {
     request_type: bookingModule || category || 'dive',
     category,
     module: bookingModule,
@@ -74,11 +75,37 @@ async function createBookingRequest(formData: FormData) {
       source: 'public-bookings-page',
       locale,
     },
-  });
+  };
+
+  const { data, error } = await supabase
+    .from('booking_requests')
+    .insert(bookingPayload)
+    .select('id, created_at')
+    .single();
 
   if (error) {
     console.error('Booking request insert failed:', error);
     redirect(withStatus(locale, 'error', formData));
+  }
+
+  const whatsappResult = await notifyBookingLeadOnWhatsApp({
+    id: data?.id,
+    locale,
+    requestType: bookingPayload.request_type,
+    category,
+    module: bookingModule,
+    siteSlug: site,
+    itemSlug: item,
+    contactName,
+    phone,
+    email,
+    preferredDate,
+    diverLevel,
+    notes,
+  });
+
+  if (!whatsappResult.ok && whatsappResult.status === 'failed') {
+    console.error('OpenWA booking notification failed:', whatsappResult.reason);
   }
 
   redirect(withStatus(locale, 'sent', formData));
@@ -89,14 +116,14 @@ export default async function BookingsPage({ searchParams }: { searchParams: Boo
   const isRTL = locale === 'he';
   const query = await searchParams;
   const category = typeof query.category === 'string' ? query.category : '';
-  const module = typeof query.module === 'string' ? query.module : '';
+  const selectedModule = typeof query.module === 'string' ? query.module : '';
   const site = typeof query.site === 'string' ? query.site : '';
   const item = typeof query.item === 'string' ? query.item : '';
   const status = typeof query.status === 'string' ? query.status : '';
   const categoryMeta = categoryLabels[category] || categoryLabels.dive;
-  const moduleMeta = module ? moduleLabels[module] : null;
+  const moduleMeta = selectedModule ? moduleLabels[selectedModule] : null;
   const title = moduleMeta ? (isRTL ? moduleMeta.he : moduleMeta.en) : (isRTL ? categoryMeta.he : categoryMeta.en);
-  const nextPath = `/${locale}/bookings${site ? `?site=${site}` : module ? `?module=${module}` : category ? `?category=${category}` : ''}`;
+  const nextPath = `/${locale}/bookings${site ? `?site=${site}` : selectedModule ? `?module=${selectedModule}` : category ? `?category=${category}` : ''}`;
   const statusCopy: Record<string, { tone: string; text: string }> = {
     sent: { tone: 'border-emerald-200 bg-emerald-50 text-emerald-800', text: isRTL ? 'הבקשה נקלטה. אפשר לחזור אליכם עם פרטי ההזמנה.' : 'Request received. The team can follow up with booking details.' },
     missing: { tone: 'border-amber-200 bg-amber-50 text-amber-800', text: isRTL ? 'חסר שם או טלפון. מלאו את שני השדות וננסה שוב.' : 'Name or phone is missing. Fill both fields and try again.' },
@@ -182,7 +209,7 @@ export default async function BookingsPage({ searchParams }: { searchParams: Boo
           <form action={createBookingRequest} className="mt-5 grid gap-4">
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="category" value={category} />
-            <input type="hidden" name="module" value={module} />
+            <input type="hidden" name="module" value={selectedModule} />
             <input type="hidden" name="site" value={site} />
             <input type="hidden" name="item" value={item} />
             <div className="grid gap-4 sm:grid-cols-2">
