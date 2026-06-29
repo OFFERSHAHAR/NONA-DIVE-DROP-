@@ -8,7 +8,7 @@ export const graphics = {
   heroInstructor: '/assets/graphics/01_backgrounds_web/divers_boat_sunset_1920x1080_text_safe.png',
   heroInstructorMobile: '/assets/graphics/02_backgrounds_mobile/divers_boat_sunset_1080x1920.png',
   heroPremium: '/assets/graphics/01_backgrounds_web/premium_marker_submarine_1920x1080_text_safe.png',
-  heroPremiumMobile: '/assets/graphics/02_backgrounds_mobile/premium_marker_submarine_1080x1920.png',
+  heroPremiumMobile: '/assets/graphics/02_backgrounds_mobile/hero_underwater_split_1080x1920.png',
   waterline: '/assets/graphics/03_transparent_png/waterline_wave_overlay_transparent.png',
   underwaterOverlay: '/assets/graphics/03_transparent_png/underwater_scene_overlay_transparent.png',
   reefOverlay: '/assets/graphics/03_transparent_png/coral_reef_bottom_overlay_transparent.png',
