@@ -1,0 +1,247 @@
+:root {
+  --navy: #062b5b;
+  --deep: #001b35;
+  --cyan: #18bde8;
+  --blue: #006bd6;
+  --glass: rgba(255, 255, 255, .14);
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, "Noto Sans Hebrew", sans-serif;
+  color: var(--white);
+}
+
+body {
+  background: transparent;
+}
+
+.scene {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--deep);
+}
+
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(24, 189, 232, .28), transparent 36%),
+    linear-gradient(90deg, rgba(0, 16, 36, .94), rgba(0, 31, 68, .68) 52%, rgba(0, 16, 36, .25));
+}
+
+.topbar {
+  position: absolute;
+  inset: 54px 72px auto 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  height: 96px;
+  width: auto;
+  object-fit: contain;
+}
+
+.pill {
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  padding: 16px 26px;
+  font-size: 28px;
+  font-weight: 800;
+  backdrop-filter: blur(18px);
+}
+
+.content {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  bottom: 92px;
+  display: grid;
+  grid-template-columns: 1fr 520px;
+  gap: 56px;
+  align-items: end;
+}
+
+.copy {
+  max-width: 980px;
+  direction: rtl;
+  text-align: right;
+}
+
+.eyebrow {
+  display: inline-flex;
+  border-radius: 999px;
+  background: rgba(24, 189, 232, .18);
+  padding: 14px 24px;
+  color: #bdf4ff;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+h1 {
+  margin: 28px 0 0;
+  font-size: 94px;
+  line-height: 1.03;
+  letter-spacing: -2.5px;
+}
+
+.cyan {
+  color: #73e6ff;
+}
+
+.lead {
+  margin: 28px 0 0;
+  max-width: 840px;
+  color: #dff8ff;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.38;
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 44px;
+  background: rgba(255, 255, 255, .92);
+  padding: 30px;
+  color: var(--navy);
+  box-shadow: 0 34px 90px rgba(0, 18, 42, .38);
+  backdrop-filter: blur(18px);
+}
+
+.panel img {
+  width: 100%;
+  height: auto;
+  border-radius: 30px;
+  object-fit: cover;
+}
+
+.steps {
+  display: grid;
+  gap: 18px;
+  margin-top: 26px;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  gap: 18px;
+  align-items: center;
+  border-radius: 24px;
+  background: rgba(0, 107, 214, .10);
+  padding: 18px;
+  direction: rtl;
+  text-align: right;
+}
+
+.step strong {
+  display: block;
+  font-size: 24px;
+}
+
+.step span {
+  display: block;
+  margin-top: 5px;
+  color: #46617e;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.num {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
+  color: white;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.floating-asset {
+  position: absolute;
+  right: 90px;
+  bottom: 58px;
+  max-width: 520px;
+  max-height: 420px;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .42));
+}
+
+.waterline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 250px;
+  width: 100%;
+  opacity: .68;
+}
+
+.lower-third {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background: transparent;
+}
+
+.lower-card {
+  position: absolute;
+  left: 72px;
+  bottom: 66px;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 22px;
+  align-items: center;
+  min-width: 720px;
+  border: 1px solid rgba(255, 255, 255, .26);
+  border-radius: 34px;
+  background: rgba(2, 35, 70, .86);
+  padding: 22px 28px;
+  color: white;
+  box-shadow: 0 24px 80px rgba(0, 16, 36, .36);
+  backdrop-filter: blur(22px);
+  direction: rtl;
+  text-align: right;
+}
+
+.lower-card img {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+}
+
+.lower-card strong {
+  display: block;
+  font-size: 38px;
+}
+
+.lower-card span {
+  display: block;
+  margin-top: 6px;
+  color: #bdf4ff;
+  font-size: 24px;
+  font-weight: 800;
+}
+

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { AppIconName } from '@/components/AppIcon';
 import type { Database, Json } from '@/types/supabase';
+import { graphics } from '@/lib/showcase/graphics';
 
 export type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
 export type ContentItem = Database['public']['Tables']['content_items']['Row'];
@@ -56,7 +57,7 @@ export function contentItemToDiveSite(item: ContentItem, fallback: DiveSite, ind
     longitude: numberValue(metadata.longitude ?? metadata.lng, fallback.longitude),
     depth: numberValue(metadata.depth ?? metadata.max_depth_m ?? metadata.max_depth, fallback.depth),
     difficulty: difficultyValue(metadata.difficulty ?? fallback.difficulty),
-    image_url: text(item.image_url, text(metadata.image_url, fallback.image_url || '/divedrop-hero-v2.png')),
+    image_url: text(item.image_url, text(metadata.image_url, fallback.image_url || graphics.heroMain)),
     created_at: item.created_at || fallback.created_at || '',
     updated_at: item.updated_at || fallback.updated_at || '',
   };
@@ -106,7 +107,7 @@ export async function getPublishedDiveSites(referenceSites: DiveSite[]): Promise
         location: site.location || 'אילת',
         depth: site.depth || referenceSites[index % referenceSites.length].depth,
         difficulty: site.difficulty || referenceSites[index % referenceSites.length].difficulty,
-        image_url: site.image_url || '/divedrop-hero-v2.png',
+        image_url: site.image_url || graphics.heroMain,
       }))
       .filter((site) => {
         const key = site.name.trim().toLowerCase();
@@ -160,7 +161,7 @@ export async function getDiveSiteById(id: string, referenceSites: DiveSite[]): P
   try {
     const supabase = await createClient();
     const { data } = await supabase.from('dive_sites').select('*').eq('id', id).maybeSingle();
-    return data ? { ...data, image_url: data.image_url || '/divedrop-hero-v2.png' } : null;
+    return data ? { ...data, image_url: data.image_url || graphics.heroMain } : null;
   } catch {
     return null;
   }

@@ -2,27 +2,32 @@ import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { AppIcon } from '@/components/AppIcon';
 import { getPublishedContentItemsByKind, type ContentItem } from '@/lib/content/public-content';
+import { graphics } from '@/lib/showcase/graphics';
 
 const equipment = [
   {
     title: { he: 'מסכות ושנורקלים', en: 'Masks and snorkels' },
     desc: { he: 'ציוד נקי ומוכן למים לכל פעילות.', en: 'Clean, water-ready gear for every activity.' },
     icon: 'equipment-rental',
+    visual: graphics.uiDiveCard,
   },
   {
     title: { he: 'סנפירים לצלילה חופשית', en: 'Free-diving fins' },
     desc: { he: 'סנפירים ארוכים לאימונים ולים פתוח.', en: 'Long fins for training and open water.' },
     icon: 'breath-badge',
+    visual: graphics.scubaDiver,
   },
   {
     title: { he: 'חליפות ומשקולות', en: 'Suits and weights' },
     desc: { he: 'התאמה מהירה לפי מידה ורמת ניסיון.', en: 'Fast matching by size and experience.' },
     icon: 'private-training',
+    visual: graphics.submarine,
   },
   {
     title: { he: 'חבילות קבוצתיות', en: 'Group bundles' },
     desc: { he: 'פתרון לצוותים, בתי ספר וקבוצות.', en: 'A package for teams, schools and groups.' },
     icon: 'group-training',
+    visual: graphics.diversOnBoat,
   },
 ];
 
@@ -44,6 +49,7 @@ export default async function EquipmentPage() {
           desc: { he: item.summary_he, en: item.summary_en || item.summary_he },
           icon: typeof metadata.icon === 'string' ? metadata.icon : 'equipment-rental',
           image: item.image_url,
+          visual: item.image_url || graphics.uiDiveCard,
         };
       })
     : equipment;
@@ -51,8 +57,12 @@ export default async function EquipmentPage() {
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-[#eef5fb] pb-28 text-[#08234a]">
       <section className="relative overflow-hidden rounded-b-[34px] bg-[#05295a] px-5 pb-10 pt-6 text-white shadow-[0_18px_50px_rgba(8,42,90,.22)]">
-        <img src="/divedrop-hero-v2.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <picture>
+          <source media="(max-width: 767px)" srcSet={graphics.heroPremiumMobile} />
+          <img src={graphics.heroPremium} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-b from-[#00162f]/30 via-[#052c61]/70 to-[#001d42]" />
+        <img src={graphics.submarine} alt="" className="pointer-events-none absolute -bottom-8 left-6 hidden w-72 opacity-80 drop-shadow-2xl md:block" />
         <div className="relative mx-auto max-w-5xl">
           <Link href={`/${locale}`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white/12 px-4 text-sm font-bold backdrop-blur hover:bg-white/20">
             <AppIcon name={isRTL ? 'arrow-right' : 'arrow-left'} className="h-5 w-5" />
@@ -73,12 +83,12 @@ export default async function EquipmentPage() {
           {visibleEquipment.map((item) => {
             const imageSrc = 'image' in item && typeof item.image === 'string' && item.image
               ? item.image
-              : `/assets/freediving/icons/services/${item.icon}.svg`;
+              : item.visual;
             return (
               <article key={`${item.icon}-${item.title.he}`} className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
                 <div className="mb-4 flex items-center gap-4">
                   <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-700 p-3 shadow-lg">
-                    <img src={imageSrc} alt="" className="h-full w-full invert" />
+                    <img src={imageSrc} alt="" className="h-full w-full object-contain drop-shadow-md" />
                   </span>
                   <h2 className="text-xl font-black">{isRTL ? item.title.he : item.title.en}</h2>
                 </div>
@@ -110,8 +120,9 @@ export default async function EquipmentPage() {
               </Link>
             </div>
             <div className="relative min-h-[300px]">
-              <img src="/divedrop-hero-v2.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <img src={graphics.heroPremium} alt="" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#001d42]/80 via-transparent to-transparent" />
+              <img src={graphics.submarine} alt="" className="absolute bottom-6 left-6 w-52 drop-shadow-2xl" />
             </div>
           </div>
         </section>

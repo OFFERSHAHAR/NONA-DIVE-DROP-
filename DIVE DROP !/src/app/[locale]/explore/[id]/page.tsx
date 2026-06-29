@@ -4,14 +4,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AppIcon } from '@/components/AppIcon';
 import { getDiveSiteById, type DiveSite } from '@/lib/content/public-content';
+import { graphics } from '@/lib/showcase/graphics';
 
 
 const referenceSites: DiveSite[] = [
-  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'אתר שונית צבעוני ונגיש לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-3', name: 'שונית הכרישים', description: 'צלילה מאתגרת יותר עם נוף כחול פתוח.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 35, difficulty: 'hard', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-4', name: 'שונית הדולפינים', description: 'אתר שונית אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'אתר שונית צבעוני ונגיש לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: graphics.heroMain, created_at: '', updated_at: '' },
+  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: graphics.heroPremium, created_at: '', updated_at: '' },
+  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: graphics.heroInstructor, created_at: '', updated_at: '' },
+  { id: 'reference-site-3', name: 'שונית הכרישים', description: 'צלילה מאתגרת יותר עם נוף כחול פתוח.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 35, difficulty: 'hard', image_url: graphics.heroPremium, created_at: '', updated_at: '' },
+  { id: 'reference-site-4', name: 'שונית הדולפינים', description: 'אתר שונית אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: graphics.heroMain, created_at: '', updated_at: '' },
 ];
 
 async function getDiveSite(id: string): Promise<DiveSite | null> {
@@ -43,7 +44,7 @@ export default async function DiveSiteDetailsPage({ params }: { params: Promise<
 
         <article className="overflow-hidden rounded-[30px] bg-white shadow-[0_18px_50px_rgba(15,63,110,.14)]">
           <div className="relative h-[280px] sm:h-[430px]">
-            <img src={site.image_url || '/divedrop-hero-v2.png'} alt={site.name} className="h-full w-full object-cover" />
+            <img src={site.image_url || graphics.heroMain} alt={site.name} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#001e46]/80 via-transparent to-transparent" />
             <div className="absolute inset-x-5 bottom-5 text-white sm:inset-x-8 sm:bottom-8">
               <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-cyan-500 px-3 py-1 text-sm font-bold">

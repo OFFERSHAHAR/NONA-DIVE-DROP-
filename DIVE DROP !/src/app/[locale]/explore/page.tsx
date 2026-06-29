@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server';
 import { Card, CardBody } from '@/components/Card';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
 import { getPublishedDiveSites, getPublishedServiceCatalog, type DiveSite, type ServiceCatalogEntry, type ServiceCategoryKey } from '@/lib/content/public-content';
+import { graphics } from '@/lib/showcase/graphics';
 
 const serviceCatalog: Record<ServiceCategoryKey, ServiceCatalogEntry> = {
   clubs: {
@@ -61,11 +62,11 @@ const serviceCatalog: Record<ServiceCategoryKey, ServiceCatalogEntry> = {
 };
 
 const referenceSites: DiveSite[] = [
-  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-3', name: 'שונית הכרישים', description: 'צלילה מאתגרת יותר עם נוף כחול פתוח.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 35, difficulty: 'hard', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-4', name: 'שונית הדולפינים', description: 'אתר אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: graphics.heroMain, created_at: '', updated_at: '' },
+  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: graphics.heroPremium, created_at: '', updated_at: '' },
+  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: graphics.heroInstructor, created_at: '', updated_at: '' },
+  { id: 'reference-site-3', name: 'שונית הכרישים', description: 'צלילה מאתגרת יותר עם נוף כחול פתוח.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 35, difficulty: 'hard', image_url: graphics.heroPremium, created_at: '', updated_at: '' },
+  { id: 'reference-site-4', name: 'שונית הדולפינים', description: 'אתר אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: graphics.heroMain, created_at: '', updated_at: '' },
 ];
 
 async function getAllDiveSites(): Promise<DiveSite[]> {
@@ -353,5 +354,5 @@ function getDifficultyDotClass(difficulty: string): string {
 
 function getDiveSiteImage(name: string): string {
   void name;
-  return '/divedrop-hero-v2.png';
+  return graphics.heroMain;
 }

@@ -6,6 +6,7 @@ import { useLocale } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
+import { graphics } from '@/lib/showcase/graphics';
 
 export interface HeaderProps {
   showNotificationBadge?: boolean;
@@ -72,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
             href={`/${locale}`}
             className={clsx('items-center justify-center group', isHome ? 'absolute left-1/2 flex -translate-x-1/2 lg:hidden' : 'flex flex-1')}
           >
-            <img src={isHome ? '/assets/logo/divedrop-logo-white.svg' : '/assets/logo/divedrop-logo-full.svg'} alt="DiveDrop" className={isHome ? 'h-11 w-auto' : 'h-12 w-auto'} />
+            <img src={isHome ? graphics.logoWhite : graphics.logoDark} alt="DiveDrop" className={isHome ? 'h-11 w-auto' : 'h-12 w-auto'} />
           </Link>
 
           {/* Right: Notification Bell */}
@@ -130,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="mb-6 flex items-center justify-between border-b border-border-primary pb-4 dark:border-border-dark">
               <div>
-                <img src="/assets/logo/divedrop-logo-full.svg" alt="DiveDrop" className="h-12 w-auto" />
+                <img src={graphics.logoDark} alt="DiveDrop" className="h-12 w-auto" />
                 <div className="text-sm text-text-secondary">
                   {isRTL ? 'ניווט באתר' : 'Site navigation'}
                 </div>

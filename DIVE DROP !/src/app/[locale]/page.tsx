@@ -4,15 +4,16 @@ import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
 import { getPublishedDiveSites } from '@/lib/content/public-content';
+import { graphics } from '@/lib/showcase/graphics';
 import type { Database } from '@/types/supabase';
 
 type DiveSite = Database['public']['Tables']['dive_sites']['Row'];
 
 const referenceSites: DiveSite[] = [
-  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
-  { id: 'reference-site-3', name: 'שונית הדולפינים', description: 'אתר אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: '/divedrop-hero-v2.png', created_at: '', updated_at: '' },
+  { id: 'reference-site-0', name: 'הגנים היפנים', description: 'שונית צבעונית ונגישה לצלילה רגועה.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 18, difficulty: 'easy', image_url: graphics.heroMain, created_at: '', updated_at: '' },
+  { id: 'reference-site-1', name: 'הר הסלע', description: 'אתר עומק מרשים לצוללים מנוסים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 30, difficulty: 'intermediate', image_url: graphics.heroPremium, created_at: '', updated_at: '' },
+  { id: 'reference-site-2', name: 'הסטי"ל', description: 'צלילת כלי שיט טבוע עם מסלול עשיר בפרטים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 28, difficulty: 'intermediate', image_url: graphics.heroInstructor, created_at: '', updated_at: '' },
+  { id: 'reference-site-3', name: 'שונית הדולפינים', description: 'אתר אהוב עם מים צלולים וחיים ימיים מגוונים.', location: 'אילת', latitude: 29.5, longitude: 34.9, depth: 20, difficulty: 'easy', image_url: graphics.heroMain, created_at: '', updated_at: '' },
 ];
 
 async function getFeaturedDiveSites(): Promise<DiveSite[]> {
@@ -27,7 +28,7 @@ export default async function HomePage() {
     id: sites[index]?.id ?? referenceSites[index].id,
     name: sites[index]?.name ?? referenceSites[index].name,
     depth: sites[index]?.depth ?? [18, 30, 28, 20][index],
-    image: sites[index]?.image_url || '/divedrop-hero-v2.png',
+    image: sites[index]?.image_url || referenceSites[index].image_url || graphics.heroMain,
   }));
   const recommendedBadges = [
     { icon: 'check' as AppIconName, label: isRTL ? 'מתאים לך' : 'Good match', color: 'bg-emerald-500' },
@@ -51,7 +52,7 @@ export default async function HomePage() {
       text: isRTL ? 'אימונים, דיסציפלינות ופעילויות קהילה עם גרפיקה ייעודית.' : 'Training, disciplines and community activities with a dedicated visual kit.',
       href: `/${locale}/free-diving`,
       badge: isRTL ? 'חדש במערכת' : 'New module',
-      icon: '/assets/freediving/icons/services/breath-badge.svg',
+      visual: graphics.scubaDiver,
       tone: 'from-cyan-500 to-blue-700',
     },
     {
@@ -59,7 +60,7 @@ export default async function HomePage() {
       text: isRTL ? 'מסכות, סנפירים, חליפות וחבילות לקבוצות מתוך תהליך ההזמנה.' : 'Masks, fins, suits and group bundles connected to the booking flow.',
       href: `/${locale}/equipment`,
       badge: isRTL ? 'MVP פעיל' : 'MVP ready',
-      icon: '/assets/freediving/icons/services/equipment-rental.svg',
+      visual: graphics.submarine,
       tone: 'from-blue-700 to-sky-400',
     },
   ];
@@ -69,7 +70,10 @@ export default async function HomePage() {
       <div dir="ltr" className="mx-auto grid max-w-[1536px] gap-5 pb-24 lg:grid-cols-[minmax(0,1fr)_475px] lg:gap-6 lg:p-0">
         <div dir={isRTL ? 'rtl' : 'ltr'} className="min-w-0 space-y-5">
           <section className="relative h-[690px] overflow-hidden rounded-b-[32px] shadow-[0_18px_45px_rgba(14,61,112,.16)] lg:h-[562px] lg:rounded-[0_0_28px_0]">
-            <img src="/divedrop-hero-v2.png" alt="סירת צלילה וצולל מתחת למים" className="absolute inset-0 h-full w-full object-cover object-[38%_center] lg:object-center" />
+            <picture>
+              <source media="(max-width: 767px)" srcSet={graphics.heroMainMobile} />
+              <img src={graphics.heroMain} alt="סירת צלילה וצולל מתחת למים" className="absolute inset-0 h-full w-full object-cover object-[38%_center] lg:object-center" />
+            </picture>
             <div className="absolute inset-0 bg-gradient-to-t from-[#001e46]/80 via-transparent to-transparent lg:bg-gradient-to-l lg:from-[#001c45]/65 lg:via-transparent lg:to-transparent" />
 
             <div className="absolute inset-x-7 bottom-[330px] text-right text-white lg:inset-x-auto lg:bottom-auto lg:right-14 lg:top-1/2 lg:w-[40%] lg:-translate-y-1/2">
@@ -140,7 +144,7 @@ export default async function HomePage() {
                 <Link key={module.href} href={module.href} className="group overflow-hidden rounded-[24px] border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-4 transition hover:-translate-y-1 hover:shadow-xl">
                   <div className="flex items-center gap-4">
                     <span className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${module.tone} p-3 shadow-lg`}>
-                      <img src={module.icon} alt="" className="h-full w-full invert" />
+                      <img src={module.visual} alt="" className="h-full w-full object-contain drop-shadow-md" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <span className="inline-flex rounded-full bg-cyan-100 px-3 py-1 text-xs font-black text-blue-700">{module.badge}</span>
@@ -157,7 +161,7 @@ export default async function HomePage() {
 
         <aside dir={isRTL ? 'rtl' : 'ltr'} className="space-y-5 px-4 lg:px-0 lg:pr-6 lg:pt-5">
           <div dir="ltr" className="hidden items-center justify-center py-2 lg:flex">
-            <img src="/assets/logo/divedrop-logo-full.svg" alt="DiveDrop" className="h-[88px] w-auto" />
+            <img src={graphics.logoDark} alt="DiveDrop" className="h-[88px] w-auto" />
           </div>
 
           <section className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)]">
@@ -175,7 +179,7 @@ export default async function HomePage() {
             <div className="mt-4 grid grid-cols-2 gap-3">
               {mvpModules.map((module) => (
                 <Link key={module.href} href={module.href} className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-center font-extrabold text-blue-800 transition hover:bg-blue-100">
-                  <img src={module.icon} alt="" className="mx-auto mb-2 h-7 w-7" />
+                  <img src={module.visual} alt="" className="mx-auto mb-2 h-9 w-9 object-contain" />
                   {module.title}
                 </Link>
               ))}

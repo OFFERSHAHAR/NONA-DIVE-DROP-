@@ -4,6 +4,7 @@ import { getLocale } from 'next-intl/server';
 import { AppIcon, type AppIconName } from '@/components/AppIcon';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { notifyBookingLeadOnWhatsApp } from '@/lib/whatsapp/openwa';
+import { graphics } from '@/lib/showcase/graphics';
 
 type BookingSearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -16,8 +17,8 @@ const categoryLabels: Record<string, { he: string; en: string; icon: AppIconName
 };
 
 const moduleLabels: Record<string, { he: string; en: string; icon: string }> = {
-  'free-diving': { he: 'צלילה חופשית', en: 'Free diving', icon: '/assets/freediving/icons/services/breath-badge.svg' },
-  equipment: { he: 'השכרת ציוד', en: 'Equipment rental', icon: '/assets/freediving/icons/services/equipment-rental.svg' },
+  'free-diving': { he: 'צלילה חופשית', en: 'Free diving', icon: graphics.scubaDiver },
+  equipment: { he: 'השכרת ציוד', en: 'Equipment rental', icon: graphics.submarine },
 };
 
 function formText(formData: FormData, key: string) {
@@ -152,8 +153,12 @@ export default async function BookingsPage({ searchParams }: { searchParams: Boo
   return (
     <main dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-[#eef5fb] pb-32 text-[#08234a]">
       <section className="relative overflow-hidden rounded-b-[34px] bg-[#05295a] px-5 pb-10 pt-6 text-white shadow-[0_18px_50px_rgba(8,42,90,.22)]">
-        <img src="/divedrop-hero-v2.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <picture>
+          <source media="(max-width: 767px)" srcSet={selectedModule === 'free-diving' ? graphics.heroPremiumMobile : graphics.heroMainMobile} />
+          <img src={selectedModule === 'free-diving' ? graphics.heroPremium : graphics.heroMain} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-b from-[#00162f]/30 via-[#052c61]/75 to-[#001d42]" />
+        <img src={selectedModule === 'equipment' ? graphics.submarine : graphics.scubaDiver} alt="" className="pointer-events-none absolute -bottom-8 left-5 hidden w-72 opacity-80 drop-shadow-2xl md:block" />
         <div className="relative mx-auto max-w-5xl">
           <Link href={`/${locale}`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white/12 px-4 text-sm font-bold backdrop-blur hover:bg-white/20">
             <AppIcon name={isRTL ? 'arrow-right' : 'arrow-left'} className="h-5 w-5" />
@@ -173,7 +178,7 @@ export default async function BookingsPage({ searchParams }: { searchParams: Boo
         <section className="rounded-[28px] bg-white p-5 shadow-[0_12px_35px_rgba(15,63,110,.10)] sm:p-7">
           <div className="flex items-center gap-4">
             <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-700 p-3 text-white shadow-lg">
-              {moduleMeta ? <img src={moduleMeta.icon} alt="" className="h-full w-full invert" /> : <AppIcon name={categoryMeta.icon} className="h-9 w-9" />}
+              {moduleMeta ? <img src={moduleMeta.icon} alt="" className="h-full w-full object-contain drop-shadow-md" /> : <AppIcon name={categoryMeta.icon} className="h-9 w-9" />}
             </span>
             <div>
               <h2 className="text-2xl font-black">{title}</h2>
